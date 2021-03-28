@@ -57,9 +57,9 @@ namespace BooksSplitedGUI
             EbookSplited.CapitulosAOmitir[Chapter] = !EbookSplited.CapitulosAOmitir[Chapter];
             Update();
             EbookSplited.Save();
-            if (!MainWindow.DicBooksSaved.ContainsKey(EbookSplited.RelativePath))
+            if (!MainWindow.DicBooksSaved.ContainsKey(EbookSplited.RelativeEbookPath))
             {
-                MainWindow.DicBooksSaved.Add(EbookSplited.RelativePath, EbookSplited);
+                MainWindow.DicBooksSaved.Add(EbookSplited.RelativeEbookPath, EbookSplited);
             }
         }
         public static ChapterViwer[] GetChapters(EbookSplited ebookSplited)

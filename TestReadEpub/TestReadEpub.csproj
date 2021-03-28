@@ -7,12 +7,9 @@
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="0.14.0" />
-    <PackageReference Include="Gabriel.Cat.S.Utilitats" Version="1.1.5.3" />
+    <PackageReference Include="Gabriel.Cat.S.Binaris" Version="1.1.5-Preview1.0" />
+    <PackageReference Include="Gabriel.Cat.S.Utilitats" Version="1.1.5.4" />
     <PackageReference Include="VersOne.Epub" Version="3.0.3.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\GitHub\Gabriel.Cat.S.Binaris\Gabriel.Cat.S.Binaris.csproj" />
   </ItemGroup>
 
 </Project>

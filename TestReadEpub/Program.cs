@@ -14,7 +14,11 @@ namespace TestReadEpub
             EbookSplited desSerializado;
             EbookSplited ebook;
 
-            FileInfo file = new DirectoryInfo(EbookSplited.Directory).GetDirectories()[0].GetFiles()[5];
+            FileInfo file;
+            DirectoryInfo dir = new DirectoryInfo(Environment.CurrentDirectory);
+
+            Ebook.Directory = new DirectoryInfo(System.IO.Path.Combine(dir.Parent.Parent.Parent.Parent.FullName,@"BooksSplitedGUI\bin\Debug\netcoreapp3.1\Ebooks")).FullName;
+            file= new DirectoryInfo(Ebook.Directory).GetDirectories()[0].GetFiles()[5];
 
 
      

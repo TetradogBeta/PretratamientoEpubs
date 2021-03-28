@@ -16,17 +16,17 @@ namespace TestReadEpub
         public EbookSplited() { }
         public EbookSplited(string relativePath)
         {
-            RelativePath = relativePath;
-            Ebook = new Ebook(Path);
+            RelativeEbookPath = relativePath;
+            Ebook = new Ebook(EbookPath);
             OriginalTitle = Ebook.Epub.Title;
             CapitulosAOmitir = new bool[Ebook.TotalChapters];
             Idioma = "NO DEFINIDO";
             UpdateTotalChapters();
         }
-        public EbookSplited(FileInfo file) : this(System.IO.Path.GetRelativePath(Directory, file.FullName)) { }
+        public EbookSplited(FileInfo epubFile) : this(System.IO.Path.GetRelativePath(Ebook.Directory, epubFile.FullName)) { }
 
-        public string RelativePath { get; set; }
-        public string Path => System.IO.Path.Combine(Directory, RelativePath);
+        public string RelativeEbookPath { get; set; }
+        public string EbookPath => System.IO.Path.Combine(Ebook.Directory, RelativeEbookPath);
         public string OriginalTitle { get; set; }
         public string Idioma { get; set; }
 
@@ -46,7 +46,7 @@ namespace TestReadEpub
 
         void ISaveAndLoad.Load()
         {
-            Ebook = new Ebook(Path);
+            Ebook = new Ebook(EbookPath);
             UpdateTotalChapters();
         }
 
@@ -59,8 +59,6 @@ namespace TestReadEpub
         {
             if (!System.IO.Directory.Exists(Directory))
                 System.IO.Directory.CreateDirectory(Directory);
-            if (File.Exists(SavePath))
-                File.Delete(SavePath);
             GetBytes().Save(SavePath);
         }
         #endregion
@@ -101,7 +99,7 @@ namespace TestReadEpub
 
         public override string ToString()
         {
-            return RelativePath;
+            return $"[{Idioma}] {RelativeEbookPath}";
         }
 
         public static EbookSplited GetEbookSplited(byte[] bytesFile) => (EbookSplited)Serializador.GetObject(bytesFile);

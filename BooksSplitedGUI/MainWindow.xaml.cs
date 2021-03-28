@@ -55,8 +55,8 @@ namespace BooksSplitedGUI
                 newsEbooks = EbookSplited.GetEbookSplitedNewer((string)lstFolders.SelectedItem);
                 for(int i = 0; i < newsEbooks.Length; i++)
                 {
-                    if (DicBooksSaved.ContainsKey(newsEbooks[i].RelativePath))
-                        lstBooksFolder.Items.Add(DicBooksSaved[newsEbooks[i].RelativePath]);
+                    if (DicBooksSaved.ContainsKey(newsEbooks[i].RelativeEbookPath))
+                        lstBooksFolder.Items.Add(DicBooksSaved[newsEbooks[i].RelativeEbookPath]);
                     else lstBooksFolder.Items.Add(newsEbooks[i]);
                 }
                 lstBooksFolder.SelectedIndex = 0;
@@ -70,7 +70,7 @@ namespace BooksSplitedGUI
 
             if (!Equals(Selected, default))
             {
-                if (DicBooksSaved.ContainsKey(Selected.RelativePath))
+                if (DicBooksSaved.ContainsKey(Selected.RelativeEbookPath))
                 {
                     txtNameFile.Text = Selected.OriginalTitle + ";" + Selected.Idioma;
                 }
@@ -88,6 +88,7 @@ namespace BooksSplitedGUI
                 campos = txtNameFile.Text.Split(';');
                 Selected.OriginalTitle = campos[0];
                 Selected.Idioma = campos[1];
+                lstBooksFolder.Items.Refresh();
             }
             else
             {
@@ -108,10 +109,10 @@ namespace BooksSplitedGUI
             DicBooksSaved.Clear();
             foreach (EbookSplited ebookSplited in EbookSplited.GetEbookSpliteds())
             {
-                if (!DicBooksSaved.ContainsKey(ebookSplited.RelativePath))
-                    DicBooksSaved.Add(ebookSplited.RelativePath, ebookSplited);
+                if (!DicBooksSaved.ContainsKey(ebookSplited.RelativeEbookPath))
+                    DicBooksSaved.Add(ebookSplited.RelativeEbookPath, ebookSplited);
                 else
-                    DicBooksSaved[ebookSplited.RelativePath] = ebookSplited;
+                    DicBooksSaved[ebookSplited.RelativeEbookPath] = ebookSplited;
             }
         }
 
