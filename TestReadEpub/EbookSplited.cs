@@ -1,0 +1,119 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Gabriel.Cat.S.Binaris;
+using Gabriel.Cat.S.Extension;
+
+namespace TestReadEpub
+{
+    public class EbookSplited:ISaveAndLoad,IElementoBinarioComplejo
+    {
+        
+        public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<EbookSplited>();
+        public static string Directory { get; set; } = new DirectoryInfo("EbookSpliteds").FullName;
+
+        int totalChapters;
+        public EbookSplited() { }
+        public EbookSplited(string relativePath)
+        {
+            RelativePath = relativePath;
+            Ebook = new Ebook(Path);
+            OriginalTitle = Ebook.Epub.Title;
+            CapitulosAOmitir = new bool[Ebook.TotalChapters];
+            Idioma = "NO DEFINIDO";
+            UpdateTotalChapters();
+        }
+        public EbookSplited(FileInfo file) : this(System.IO.Path.GetRelativePath(Directory, file.FullName)) { }
+
+        public string RelativePath { get; set; }
+        public string Path => System.IO.Path.Combine(Directory, RelativePath);
+        public string OriginalTitle { get; set; }
+        public string Idioma { get; set; }
+
+        public bool[] CapitulosAOmitir { get; set; }
+
+        public string SavePath => System.IO.Path.Combine(Directory, OriginalTitle + " [" + Idioma + "] .ebookSlited");
+
+
+        [IgnoreSerialitzer]
+        public Ebook Ebook { get; set; }
+
+        public int TotalChapters => totalChapters;
+
+        #region Serializar
+
+        ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
+
+        void ISaveAndLoad.Load()
+        {
+            Ebook = new Ebook(Path);
+            UpdateTotalChapters();
+        }
+
+        void ISaveAndLoad.Save()
+        {
+          
+        }
+        public byte[] GetBytes() => Serializador.GetBytes(this);
+        public void Save()
+        {
+            if (!System.IO.Directory.Exists(Directory))
+                System.IO.Directory.CreateDirectory(Directory);
+            if (File.Exists(SavePath))
+                File.Delete(SavePath);
+            GetBytes().Save(SavePath);
+        }
+        #endregion
+        public void SetCapitulosAOmitir(params int[] capitulosAOmitir)
+        {
+            //pongo los capitulos a omitir
+            for (int i = 0; i < capitulosAOmitir.Length; i++)
+                CapitulosAOmitir[capitulosAOmitir[i]] = true;
+
+            UpdateTotalChapters();
+        }
+
+        public void UpdateTotalChapters()
+        {
+            totalChapters = CapitulosAOmitir.Where((chapter) => !chapter).ToArray().Length;
+
+        }
+        public IEnumerable<string> GetContentElements(int chapterSplited, string element = "p")
+        {
+            return Ebook.GetContentElements(GetRealChapter(chapterSplited), element);
+                
+        }
+
+        private int GetRealChapter(int chapterSplited)
+        {
+            int realChapter =0;
+
+            for(int i = 0; i <= chapterSplited; i++)
+            {
+                while (CapitulosAOmitir[realChapter++]) ;
+         
+            }
+
+            return realChapter-1;
+        }
+
+        public string[] GetContentElementsArray(int chapterSplited, string element = "p") => GetContentElements(chapterSplited, element).ToArray();
+
+        public override string ToString()
+        {
+            return RelativePath;
+        }
+
+        public static EbookSplited GetEbookSplited(byte[] bytesFile) => (EbookSplited)Serializador.GetObject(bytesFile);
+        public static EbookSplited[] GetEbookSplitedNewer(string folder)
+        {
+            FileInfo[] files = new DirectoryInfo(System.IO.Path.Combine(Ebook.Directory,folder)).GetFiles();
+            return files.Convert((e) => new EbookSplited(e));
+        }
+        public static EbookSplited[] GetEbookSpliteds()
+        {
+            FileInfo[] files = new DirectoryInfo(EbookSplited.Directory).GetFiles();
+            return files.Convert((e) => GetEbookSplited(e.GetBytes()));
+        }
+    }
+}
