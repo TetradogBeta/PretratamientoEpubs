@@ -10,6 +10,8 @@ namespace TestReadEpub
     {
         
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<EbookSplited>();
+
+        [IgnoreSerialitzer]
         public static string Directory { get; set; } = new DirectoryInfo("EbookSpliteds").FullName;
 
         int totalChapters;
