@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TestReadEpub;
 using Gabriel.Cat.S.Extension;
+using System.Linq;
 
 namespace BooksSplitedGUI
 {
@@ -34,7 +35,7 @@ namespace BooksSplitedGUI
             EbookSplited = ebookSplited;
             Chapter = chapter;
 
-            txtContent.Text =string.Join('\n', EbookSplited.Ebook.GetContentElementsArray(Chapter));
+            txtContent.Text =string.Join('\n', EbookSplited.Ebook.GetContentElements(Chapter).Take(3));
             Update();
         }
         public int Chapter { get; set; }

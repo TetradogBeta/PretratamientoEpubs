@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BooksSplitedGUI"
         mc:Ignorable="d"
-        Title="BookSplited GUI V1.2" Height="450" Width="800" KeyDown="Window_KeyDown">
+        Title="BookSplited GUI V1.3" Height="450" Width="800" KeyDown="Window_KeyDown">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

@@ -1,6 +1,7 @@
 ﻿using Gabriel.Cat.S.Extension;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,6 +28,11 @@ namespace BooksSplitedGUI
         public MainWindow()
         {
             InitializeComponent();
+
+            if (!Directory.Exists(Ebook.Directory))
+                Directory.CreateDirectory(Ebook.Directory);
+            if (!Directory.Exists(EbookSplited.Directory))
+                Directory.CreateDirectory(EbookSplited.Directory);
 
             UpdateFolders();
             
