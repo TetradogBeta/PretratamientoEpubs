@@ -4,7 +4,7 @@ using System.Linq;
 using Gabriel.Cat.S.Binaris;
 using Gabriel.Cat.S.Extension;
 
-namespace TestReadEpub
+namespace CommonEbookPretractament
 {
     public class EbookSplited:ISaveAndLoad,IElementoBinarioComplejo
     {
@@ -12,7 +12,13 @@ namespace TestReadEpub
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<EbookSplited>();
 
         [IgnoreSerialitzer]
-        public static string Directory { get; set; } = new DirectoryInfo("EbookSpliteds").FullName;
+        public static string Directory { get; set; } 
+        static EbookSplited()
+        {
+            Directory = new DirectoryInfo("EbookSpliteds").FullName;
+            if (!System.IO.Directory.Exists(Directory))
+                System.IO.Directory.CreateDirectory(Directory);
+        }
 
         int totalChapters;
         public EbookSplited() { }
@@ -34,7 +40,7 @@ namespace TestReadEpub
 
         public bool[] CapitulosAOmitir { get; set; }
 
-        public string SavePath => System.IO.Path.Combine(Directory, OriginalTitle + " [" + Idioma + "] .ebookSlited");
+        public string SavePath => System.IO.Path.Combine(Directory, $"{OriginalTitle}  [{ Idioma}].ebookSplited");
 
 
         [IgnoreSerialitzer]

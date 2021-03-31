@@ -6,12 +6,18 @@ using System.Linq;
 using System.Text;
 using VersOne.Epub;
 
-namespace TestReadEpub
+namespace CommonEbookPretractament
 {
     public class Ebook
     {
         static AngleSharp.Html.Parser.HtmlParser Parser = new AngleSharp.Html.Parser.HtmlParser();
-        public static string Directory { get; set; } = new DirectoryInfo("Ebooks").FullName;
+        public static string Directory { get; set; }
+        static Ebook()
+        {
+            Directory = new DirectoryInfo("Ebooks").FullName;
+            if (!System.IO.Directory.Exists(Directory))
+                System.IO.Directory.CreateDirectory(Directory);
+        }
 
         public Ebook() { }
         public Ebook(string filePath)

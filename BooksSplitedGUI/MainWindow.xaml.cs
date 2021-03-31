@@ -14,7 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using TestReadEpub;
+using CommonEbookPretractament;
 
 namespace BooksSplitedGUI
 {
@@ -28,11 +28,6 @@ namespace BooksSplitedGUI
         public MainWindow()
         {
             InitializeComponent();
-
-            if (!Directory.Exists(Ebook.Directory))
-                Directory.CreateDirectory(Ebook.Directory);
-            if (!Directory.Exists(EbookSplited.Directory))
-                Directory.CreateDirectory(EbookSplited.Directory);
 
             UpdateFolders();
             

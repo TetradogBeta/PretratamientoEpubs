@@ -4,7 +4,7 @@ using VersOne.Epub;
 using System.Collections.Generic;
 
 
-namespace TestReadEpub
+namespace CommonEbookPretractament
 {
     class Program
     {
