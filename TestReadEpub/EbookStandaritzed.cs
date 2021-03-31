@@ -21,13 +21,15 @@ namespace CommonEbookPretractament
                 System.IO.Directory.CreateDirectory(Directory);
         }
 
-
+        /// <summary>
+        /// Es el libro en el que se basa la edición de la versión, haciendo que no tenga que ser el original, y si se traza un puente se puede obtener como lo tenga puesto cualquier versión
+        /// </summary>
         [IgnoreSerialitzer]
-        public EbookSplited Original { get; set; }
+        public EbookSplited Reference { get; set; }
         [IgnoreSerialitzer]
         public EbookSplited Version { get; set; }
 
-        public string OriginalPath { get; set; }
+        public string ReferencePath { get; set; }
         public string VersionPath { get; set; }
         public Capitulo[] CapitulosEditados { get; set; }
         public string SavePath => System.IO.Path.Combine(EbookStandaritzed.Directory, $"{Version.OriginalTitle} [{Version.Idioma}].ebookStandaritzed");
@@ -40,7 +42,7 @@ namespace CommonEbookPretractament
 
         void ISaveAndLoad.Load()
         {
-            Original = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookSplited.Directory, OriginalPath)));
+            Reference = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookSplited.Directory, ReferencePath)));
             Version = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookSplited.Directory, VersionPath)));
             
         }
@@ -52,11 +54,11 @@ namespace CommonEbookPretractament
         }
         public bool Finished()
         {
-            bool finished = Original.TotalChapters == Version.TotalChapters;
+            bool finished = Reference.TotalChapters == Version.TotalChapters;
 
-            for(int i=0;i<Original.TotalChapters && !finished; i++)
+            for(int i=0;i<Reference.TotalChapters && !finished; i++)
             {
-                finished = !Equals(CapitulosEditados[i],default) && CapitulosEditados[i].Finished(Original, Version, i);
+                finished = !Equals(CapitulosEditados[i],default) && CapitulosEditados[i].Finished(Reference, Version, i);
             }
 
             return finished;
@@ -72,7 +74,7 @@ namespace CommonEbookPretractament
     {
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<Capitulo>();
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
-        List<Parrafo> ParrafosEditados { get; set; } = new List<Parrafo>();
+        public List<Parrafo> ParrafosEditados { get; set; } = new List<Parrafo>();
 
         public bool Finished(EbookSplited original,EbookSplited version, int chapter)
         {
@@ -82,7 +84,7 @@ namespace CommonEbookPretractament
 
             if (!finished)
             {
-                //voy mirando hasta que vea que lo que le falta o le sobra a la versión
+                //miro los parrafos editados y si ya cuadra todo pues finished=true
             }
 
             return finished;
@@ -106,4 +108,5 @@ namespace CommonEbookPretractament
         public int Fin { get; set; } = -1;
 
     }
+    //quizás hará falta hacer otra clase para frase que mire el parrafo que empieza y en cual acaba...depende del tamaño del <p>
 }
