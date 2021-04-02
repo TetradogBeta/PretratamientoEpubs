@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Linq;
 
 namespace BookStandaritzedGUI
 {
@@ -24,6 +25,7 @@ namespace BookStandaritzedGUI
         {
             InitializeComponent();
         }
+        public object First => lstItems.Items.Count > 0 ? lstItems.Items[0] : default;
         public GroupItem(KeyValuePair<string,IList<object>> objs) : this()
         {
             tbGroupName.Text = objs.Key;

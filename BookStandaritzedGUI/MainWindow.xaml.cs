@@ -26,6 +26,11 @@ namespace BookStandaritzedGUI
         SortedList<string, EbookSplited> DicSplited { get; set; }
         GroupItem Group { get; set; }
         Parrafo ParrafoActual { get; set; }
+
+        EbookStandaritzed EbookActual { get; set; }
+        public string[] ParrafosCapitulosOriginal { get;  set; }
+        public string[] ParrafosCapitulosVersion { get; set; }
+
         public  MainWindow()
         {
        
@@ -36,10 +41,11 @@ namespace BookStandaritzedGUI
         }
         private void Load()
         {
-   
+
             EbookSplited[] ebooksSpited = EbookSplited.GetEbookSpliteds();
             EbookStandaritzed[] ebooksStandaritzed = EbookStandaritzed.GetEbookStandaritzeds();
             SortedList<string, List<EbookSplited>> dic = new SortedList<string, List<EbookSplited>>();
+
             lstEbookSplited.Items.Clear();
             DicSplited.Clear();
             for (int i = 0; i < ebooksSpited.Length; i++)
@@ -68,31 +74,54 @@ namespace BookStandaritzedGUI
                 };
                 lstEbookSplited.Items.Add(Group);
             }
+            if (!Equals(Group, default))
+            {
+                SetEbookSplited(Group.First as EbookSplited);
+            }
         }
 
         private void SetEbookSplited(EbookSplited ebookSpited)
         {
-            throw new NotImplementedException();
+            if (!Equals(ebookSpited, default))
+            {
+                cmbEbookOriginal.SelectedIndex = cmbEbookOriginal.Items.IndexOf(ebookSpited);
+                cmbChapters.Items.Clear();
+                cmbChapters.Items.AddRange(Enumerable.Range(0, ebookSpited.TotalChapters).ToArray().Convert((c)=>$"capitulo {c}"));
+                cmbChapters.SelectedIndex = 0;
+            }
         }
 
         private void cmbParrafosOriginal_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            rtbOriginal.SetText(ParrafosCapitulosOriginal[cmbParrafosOriginal.SelectedIndex]);
         }
 
         private void cmbParrafosVersion_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            rtbVersion.SetText(ParrafosCapitulosVersion[cmbParrafosVersion.SelectedIndex]);
         }
 
         private void cmbChapters_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            throw new NotImplementedException();
+
+
+            ParrafosCapitulosOriginal = EbookActual.Reference.GetContentElementsArray(cmbChapters.SelectedIndex);
+            ParrafosCapitulosVersion = EbookActual.Version.GetContentElementsArray(cmbChapters.SelectedIndex);
+
+            cmbParrafosOriginal.Items.Clear();
+            cmbParrafosVersion.Items.Clear();
+
+            cmbParrafosOriginal.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosOriginal.Length).ToArray().Convert((p) => $"párrafo referencia {p}"));
+            cmbParrafosVersion.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosVersion.Length).ToArray().Convert((p) => $"párrafo a mirar {p}"));
+
+            cmbParrafosVersion.SelectedIndex = 0;
+            cmbParrafosOriginal.SelectedIndex = 0;
         }
 
         private void cmbEbookOriginal_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            EbookActual.Reference = cmbEbookOriginal.SelectedItem as EbookSplited;
+            EbookActual.Save();
         }
         private int? GetIfIsNumberValid(TextBox textBox)
         {
@@ -114,6 +143,8 @@ namespace BookStandaritzedGUI
             if (number.HasValue)
             {
                 ParrafoActual.Posicion = number.Value;
+                EbookActual.Save();
+               
             }
         }
 
@@ -125,6 +156,7 @@ namespace BookStandaritzedGUI
             if (number.HasValue)
             {
                 ParrafoActual.Fin = number.Value;
+                EbookActual.Save();
             }
         }
 
@@ -134,6 +166,7 @@ namespace BookStandaritzedGUI
             if (number.HasValue)
             {
                 ParrafoActual.Inicio = number.Value;
+                EbookActual.Save();
             }
         }
 
@@ -143,6 +176,7 @@ namespace BookStandaritzedGUI
             if (number.HasValue)
             {
                 ParrafoActual.IndexFin = number.Value;
+                EbookActual.Save();
             }
         }
 
@@ -152,17 +186,20 @@ namespace BookStandaritzedGUI
             if (number.HasValue)
             {
                 ParrafoActual.IndexInicio = number.Value;
+                EbookActual.Save();
             }
         }
 
         private void chkbSaltarParrafo_Checked(object sender, RoutedEventArgs e)
         {
             ParrafoActual.Saltar = true;
+            EbookActual.Save();
         }
 
         private void chkbSaltarParrafo_Unchecked(object sender, RoutedEventArgs e)
         {
             ParrafoActual.Saltar = false;
+            EbookActual.Save();
         }
     }
 }
