@@ -38,7 +38,7 @@
                     <ColumnDefinition MaxWidth="250"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <Grid>
+                <StackPanel>
                     <!--aqui configuro el parrafo, permite editar y crear
                     
                             Index 
@@ -51,7 +51,41 @@
                             Fin  = -1;
                     
                     -->
-                </Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock  Text="Index actual"/>
+                        <TextBlock x:Name="tbIndex"/>
+                    </StackPanel>
+                    <CheckBox x:Name="chkbSaltarParrafo" Content="Saltar Parrafo" Checked="chkbSaltarParrafo_Checked" Unchecked="chkbSaltarParrafo_Unchecked"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Index Inicio"/>
+                        <TextBox x:Name="txtIndexInicio" Width="150" TextChanged="txtIndexInicio_TextChanged"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Index Fin"/>
+                        <Grid Width="12"/>
+                        <TextBox x:Name="txtIndexFin" Width="150" TextChanged="txtIndexFin_TextChanged" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Inicio"/>
+                        <Grid Width="32"/>
+                        <TextBox x:Name="txtInicio" Width="150" TextChanged="txtInicio_TextChanged"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Fin"/>
+                        <Grid Width="44"/>
+                        <TextBox x:Name="txtFin" Width="150" TextChanged="txtFin_TextChanged"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Posicion"/>
+                        <Grid Width="16"/>
+                        <TextBox x:Name="txtPos" Width="150" TextChanged="txtPos_TextChanged" />
+                    </StackPanel>
+
+                    <Grid Height="29"/>
+                    <Button x:Name="btnNuevo" Content="Nuevo"/>
+
+
+                </StackPanel>
                 <ScrollViewer  Grid.Column="1" VerticalScrollBarVisibility="Auto">
                     <UniformGrid x:Name="parrafosCapitulo"/>
                 </ScrollViewer>
