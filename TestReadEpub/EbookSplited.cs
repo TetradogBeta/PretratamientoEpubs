@@ -107,7 +107,7 @@ namespace CommonEbookPretractament
 
         public override string ToString()
         {
-            return $"[{Idioma}] {RelativeEbookPath}";
+            return $"[{Idioma}] {OriginalTitle}";
         }
 
         public static EbookSplited GetEbookSplited(byte[] bytesFile) => (EbookSplited)Serializador.GetObject(bytesFile);

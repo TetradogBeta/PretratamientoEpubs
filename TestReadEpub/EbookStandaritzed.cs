@@ -20,32 +20,59 @@ namespace CommonEbookPretractament
             if (!System.IO.Directory.Exists(Directory))
                 System.IO.Directory.CreateDirectory(Directory);
         }
+        public EbookStandaritzed() { }
+        public EbookStandaritzed(EbookSplited ebookSplitedVersion,EbookSplited ebookSplitedReference = default)
+        {
+            if (Equals(ebookSplitedVersion, default))
+            {
+                throw new NullReferenceException("se requiere un ebook splited!");
+            }
+            if (Equals(ebookSplitedReference, default))
+            {
+                ebookSplitedReference = ebookSplitedVersion;
+            }
+            Version = ebookSplitedVersion;
+            Reference = new EbookStandaritzed() { Version = ebookSplitedReference };
+            CapitulosEditados = new Capitulo[Version.TotalChapters];
+        }
 
         /// <summary>
         /// Es el libro en el que se basa la edición de la versión, haciendo que no tenga que ser el original, y si se traza un puente se puede obtener como lo tenga puesto cualquier versión
         /// </summary>
         [IgnoreSerialitzer]
-        public EbookSplited Reference { get; set; }
+        public EbookStandaritzed Reference { get; set; }
         [IgnoreSerialitzer]
         public EbookSplited Version { get; set; }
 
         public string ReferencePath { get; set; }
         public string VersionPath { get; set; }
         public Capitulo[] CapitulosEditados { get; set; }
+        public int TotalChapters => Version.TotalChapters;
         public string SavePath => System.IO.Path.Combine(EbookStandaritzed.Directory, $"{Version.OriginalTitle} [{Version.Idioma}].ebookStandaritzed");
 
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
         void ISaveAndLoad.Save()
         {
-            ReferencePath =System.IO.Path.GetRelativePath(EbookSplited.Directory,  Reference.SavePath);
+            if (!Equals(Reference, default))
+            {
+                ReferencePath = System.IO.Path.GetRelativePath(EbookSplited.Directory, Reference.SavePath);
+            }
             VersionPath   =System.IO.Path.GetRelativePath(EbookSplited.Directory,  Version.SavePath);
         }
 
         void ISaveAndLoad.Load()
         {
-            Reference = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookSplited.Directory, ReferencePath)));
+
             Version   = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookSplited.Directory, VersionPath)));
-            
+            if (!Equals(ReferencePath, default))
+            {
+                Reference = EbookStandaritzed.GetEbookStandaritzed(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookStandaritzed.Directory, ReferencePath)));
+            }
+            else
+            {
+                Reference = new EbookStandaritzed() { Version = this.Version };
+            }
+
         }
         public byte[] GetBytes() => Serializador.GetBytes(this);
 
@@ -64,6 +91,7 @@ namespace CommonEbookPretractament
 
             return finished;
         }
+        public static EbookStandaritzed GetEbookStandaritzed(byte[] data) => (EbookStandaritzed)Serializador.GetObject(data);
         public static EbookStandaritzed[] GetEbookStandaritzeds()
         {
             FileInfo[] files = new DirectoryInfo(Directory).GetFiles();
@@ -77,9 +105,9 @@ namespace CommonEbookPretractament
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
         public List<Parrafo> ParrafosEditados { get; set; } = new List<Parrafo>();
 
-        public bool Finished(EbookSplited original,EbookSplited version, int chapter)
+        public bool Finished(EbookStandaritzed original,EbookSplited version, int chapter)
         {
-            string[] parrafosOriginal = original.GetContentElementsArray(chapter);
+            string[] parrafosOriginal = original.Version.GetContentElementsArray(chapter);
             string[] parrafosVersion = version.GetContentElementsArray(chapter);
             bool finished =parrafosOriginal.Length == parrafosVersion.Length;
 

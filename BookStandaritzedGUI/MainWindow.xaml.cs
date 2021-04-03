@@ -91,7 +91,15 @@ namespace BookStandaritzedGUI
         {
             if (!Equals(ebookSpited, default) && !Equals(EbookActual.Version,ebookSpited))
             {
-                EbookActual = new EbookStandaritzed() { Reference = ebookSpited, Version = ebookSpited };
+                if (!DicStandard.ContainsKey(ebookSpited.ToString()))
+                {
+                    EbookActual = new EbookStandaritzed(ebookSpited);
+                    DicStandard.Add(ebookSpited.ToString(), EbookActual);
+                }
+                else
+                {
+                    EbookActual = DicStandard[ebookSpited.ToString()];
+                }
                 cmbEbookOriginal.SelectedIndex = cmbEbookOriginal.Items.IndexOf(ebookSpited);
                 cmbChapters.Items.Clear();
                 cmbChapters.Items.AddRange(Enumerable.Range(0, ebookSpited.TotalChapters).ToArray().Convert((c)=>$"capitulo {c}"));
