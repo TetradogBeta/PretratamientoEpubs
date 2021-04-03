@@ -17,7 +17,7 @@
                 <ColumnDefinition Width="15"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-        <ListBox x:Name="lstItems" Grid.Column="1" SelectionChanged="lstItems_SelectionChanged" Visibility="Hidden"/>
+        <ListBox x:Name="lstItems" Grid.Column="1" SelectionChanged="lstItems_SelectionChanged" Height="0"/>
         </Grid>
 
     </Grid>

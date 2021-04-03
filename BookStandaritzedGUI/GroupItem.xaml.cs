@@ -25,12 +25,20 @@ namespace BookStandaritzedGUI
         {
             InitializeComponent();
         }
-        public object First => lstItems.Items.Count > 0 ? lstItems.Items[0] : default;
+
         public GroupItem(KeyValuePair<string,IList<object>> objs) : this()
         {
             tbGroupName.Text = objs.Key;
             lstItems.Items.AddRange(objs.Value);
         }
+        public object FirstOrDefault => Items.Count > 0 ? Items[0] : default;
+        public ItemCollection Items => lstItems.Items;
+        public object SelectedItem
+        {
+            get => lstItems.SelectedItem;
+            set=> lstItems.SelectedItem = value;
+        }
+
         public void UnselectItem()
         {
             lstItems.SelectedIndex = -1;
@@ -46,7 +54,9 @@ namespace BookStandaritzedGUI
 
         private void tbGroupName_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            lstItems.Visibility = Visibility.Visible == lstItems.Visibility ? Visibility.Hidden : Visibility.Visible;
+            const double INVISIBLE = 0;
+            const int HEIGHT_ITEM = 20;
+            lstItems.Height = lstItems.Height == INVISIBLE ? HEIGHT_ITEM * Items.Count:INVISIBLE ;
         }
     }
     public class ItemSelectedEventArgs : EventArgs

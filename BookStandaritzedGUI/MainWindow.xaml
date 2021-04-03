@@ -27,10 +27,12 @@
                     <RowDefinition/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <RichTextBox x:Name="rtbOriginal"/>
-                <RichTextBox x:Name="rtbVersion" Grid.Column="1"/>
-                <ComboBox x:Name="cmbParrafosOriginal" Grid.Row="1" SelectionChanged="cmbParrafosOriginal_SelectionChanged"/>
-                <ComboBox x:Name="cmbParrafosVersion" Grid.Row="1" Grid.Column="1" SelectionChanged="cmbParrafosVersion_SelectionChanged"/>
+                <RichTextBox x:Name="rtbVersion"  Background="AntiqueWhite"/>
+                <RichTextBox x:Name="rtbOriginal" Grid.Column="1" Background="AliceBlue"/>
+                
+                <ComboBox x:Name="cmbParrafosVersion" Grid.Row="1"  SelectionChanged="cmbParrafosVersion_SelectionChanged"/>
+                <ComboBox x:Name="cmbParrafosReference" Grid.Row="1" Grid.Column="1" SelectionChanged="cmbParrafosReference_SelectionChanged"/>
+               
 
             </Grid>
             <Grid Grid.Row="1">
@@ -92,7 +94,7 @@
             </Grid>
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
+                    <ColumnDefinition  MaxWidth="250"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <ComboBox x:Name="cmbChapters" SelectionChanged="cmbChapters_SelectionChanged"/>

@@ -28,15 +28,19 @@ namespace BookStandaritzedGUI
         Parrafo ParrafoActual { get; set; }
 
         EbookStandaritzed EbookActual { get; set; }
-        public string[] ParrafosCapitulosOriginal { get;  set; }
-        public string[] ParrafosCapitulosVersion { get; set; }
+        string[] ParrafosCapitulosReference { get;  set; }
+        string[] ParrafosCapitulosVersion { get; set; }
 
         public  MainWindow()
         {
-       
-            InitializeComponent();
             DicStandard = new SortedList<string, EbookStandaritzed>();
             DicSplited = new SortedList<string, EbookSplited>();
+            ParrafoActual = new Parrafo();
+            EbookActual = new EbookStandaritzed();
+            ParrafosCapitulosReference = new string[]{ string.Empty };
+            ParrafosCapitulosVersion  = new string[]{ string.Empty };
+            InitializeComponent();
+
             Load();
         }
         private void Load()
@@ -65,64 +69,111 @@ namespace BookStandaritzedGUI
                 Group = new GroupItem(new KeyValuePair<string, IList<object>>(title.Key, title.Value.Convert((item) => (object)item)));
                 Group.Selected += (s, e) =>
                 {
-                    if (Group != default)
+                    if (!Equals(EbookActual.Version, e.Object))
                     {
-                        Group.UnselectItem();
+                        if (Group != default)
+                        {
+                            Group.UnselectItem();
+                        }
+                        Group = s as GroupItem;
+                        SetEbookSplited(e.Object as EbookSplited);
                     }
-                    Group = s as GroupItem;
-                    SetEbookSplited(e.Object as EbookSplited);
                 };
                 lstEbookSplited.Items.Add(Group);
             }
             if (!Equals(Group, default))
             {
-                SetEbookSplited(Group.First as EbookSplited);
+                SetEbookSplited(Group.FirstOrDefault as EbookSplited);
             }
         }
 
         private void SetEbookSplited(EbookSplited ebookSpited)
         {
-            if (!Equals(ebookSpited, default))
+            if (!Equals(ebookSpited, default) && !Equals(EbookActual.Version,ebookSpited))
             {
+                EbookActual = new EbookStandaritzed() { Reference = ebookSpited, Version = ebookSpited };
                 cmbEbookOriginal.SelectedIndex = cmbEbookOriginal.Items.IndexOf(ebookSpited);
                 cmbChapters.Items.Clear();
                 cmbChapters.Items.AddRange(Enumerable.Range(0, ebookSpited.TotalChapters).ToArray().Convert((c)=>$"capitulo {c}"));
                 cmbChapters.SelectedIndex = 0;
+                cmbEbookOriginal.Items.Clear();
+                cmbEbookOriginal.Items.AddRange(Group.Items);
+                cmbEbookOriginal.SelectedItem = ebookSpited;
+                Group.SelectedItem = ebookSpited;
+            }
+          
+        }
+
+        private void cmbParrafosReference_SelectionChanged(object sender=null, SelectionChangedEventArgs e=null)
+        {
+            if(cmbParrafosReference.SelectedIndex>=0)
+            rtbOriginal.SetText(ParrafosCapitulosReference[cmbParrafosReference.SelectedIndex]);
+        }
+
+        private void cmbParrafosVersion_SelectionChanged(object sender = null, SelectionChangedEventArgs e=null)
+        {
+            if (cmbParrafosVersion.SelectedIndex >= 0)
+                rtbVersion.SetText(ParrafosCapitulosVersion[cmbParrafosVersion.SelectedIndex]);
+        }
+
+        private void cmbChapters_SelectionChanged(object sender = null, SelectionChangedEventArgs e = null)
+        {
+
+            if (cmbChapters.SelectedIndex >= 0)
+            {
+
+                ParrafosCapitulosVersion = EbookActual.Version.GetContentElementsArray(cmbChapters.SelectedIndex);
+
+
+                cmbParrafosVersion.Items.Clear();
+
+                cmbParrafosVersion.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosVersion.Length).ToArray().Convert((p) => $"párrafo a mirar {p}"));
+
+                cmbParrafosVersion.SelectedIndex = 0;
+
+                cmbParrafosVersion_SelectionChanged();
+                SetReference(EbookActual.Reference);
             }
         }
 
-        private void cmbParrafosOriginal_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            rtbOriginal.SetText(ParrafosCapitulosOriginal[cmbParrafosOriginal.SelectedIndex]);
-        }
-
-        private void cmbParrafosVersion_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            rtbVersion.SetText(ParrafosCapitulosVersion[cmbParrafosVersion.SelectedIndex]);
-        }
-
-        private void cmbChapters_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void cmbEbookOriginal_SelectionChanged(object sender = null, SelectionChangedEventArgs e = null)
         {
 
+            if (cmbEbookOriginal.Items.Count > 0)
+            {
+                SetReference(cmbEbookOriginal.SelectedItem as EbookSplited);
 
-            ParrafosCapitulosOriginal = EbookActual.Reference.GetContentElementsArray(cmbChapters.SelectedIndex);
-            ParrafosCapitulosVersion = EbookActual.Version.GetContentElementsArray(cmbChapters.SelectedIndex);
 
-            cmbParrafosOriginal.Items.Clear();
-            cmbParrafosVersion.Items.Clear();
-
-            cmbParrafosOriginal.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosOriginal.Length).ToArray().Convert((p) => $"párrafo referencia {p}"));
-            cmbParrafosVersion.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosVersion.Length).ToArray().Convert((p) => $"párrafo a mirar {p}"));
-
-            cmbParrafosVersion.SelectedIndex = 0;
-            cmbParrafosOriginal.SelectedIndex = 0;
+                if (!Equals(EbookActual.CapitulosEditados, default) && EbookActual.CapitulosEditados.Any((c) => !Equals(c, default)))
+                {
+                    //a ver si quiere borrar los capitulos editados
+                    if (MessageBox.Show("Desea eliminar los capitulos editados?podria ser que no coincidieran con el anterior...", "Atención", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        EbookActual.CapitulosEditados = new Capitulo[EbookActual.CapitulosEditados.Length];
+                    }
+                }
+                EbookActual.Save();
+            }
         }
 
-        private void cmbEbookOriginal_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SetReference(EbookSplited ebookSplited)
         {
-            EbookActual.Reference = cmbEbookOriginal.SelectedItem as EbookSplited;
-            EbookActual.Save();
+            if (!Equals(ebookSplited, default))
+            {
+                EbookActual.Reference = ebookSplited;
+                ParrafosCapitulosReference = EbookActual.Reference.GetContentElementsArray(cmbChapters.SelectedIndex);
+                cmbParrafosReference.Items.Clear();
+                cmbParrafosReference.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosReference.Length).ToArray().Convert((p) => $"párrafo referencia {p}"));
+                cmbParrafosReference.SelectedIndex = 0;
+                cmbParrafosReference_SelectionChanged();
+
+                cmbParrafosVersion.SelectedIndex = 0;
+
+                cmbParrafosVersion_SelectionChanged();
+
+            }
         }
+
         private int? GetIfIsNumberValid(TextBox textBox)
         {
             int aux;

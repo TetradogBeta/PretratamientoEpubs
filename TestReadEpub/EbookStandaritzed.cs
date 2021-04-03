@@ -37,13 +37,14 @@ namespace CommonEbookPretractament
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
         void ISaveAndLoad.Save()
         {
-          
+            ReferencePath =System.IO.Path.GetRelativePath(EbookSplited.Directory,  Reference.SavePath);
+            VersionPath   =System.IO.Path.GetRelativePath(EbookSplited.Directory,  Version.SavePath);
         }
 
         void ISaveAndLoad.Load()
         {
             Reference = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookSplited.Directory, ReferencePath)));
-            Version = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookSplited.Directory, VersionPath)));
+            Version   = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookSplited.Directory, VersionPath)));
             
         }
         public byte[] GetBytes() => Serializador.GetBytes(this);
@@ -58,7 +59,7 @@ namespace CommonEbookPretractament
 
             for(int i=0;i<Reference.TotalChapters && !finished; i++)
             {
-                finished = !Equals(CapitulosEditados[i],default) && CapitulosEditados[i].Finished(Reference, Version, i);
+                finished = Equals(CapitulosEditados[i],default) || CapitulosEditados[i].Finished(Reference, Version, i);
             }
 
             return finished;
