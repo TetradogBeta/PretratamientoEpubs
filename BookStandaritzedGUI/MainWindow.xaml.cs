@@ -100,6 +100,7 @@ namespace BookStandaritzedGUI
                 {
                     EbookActual = DicStandard[ebookSpited.ToString()];
                 }
+
                 cmbEbookOriginal.SelectedIndex = cmbEbookOriginal.Items.IndexOf(ebookSpited);
                 cmbChapters.Items.Clear();
                 cmbChapters.Items.AddRange(Enumerable.Range(0, ebookSpited.TotalChapters).ToArray().Convert((c)=>$"capitulo {c}"));
@@ -149,7 +150,7 @@ namespace BookStandaritzedGUI
 
             if (cmbEbookOriginal.Items.Count > 0)
             {
-                SetReference(cmbEbookOriginal.SelectedItem as EbookSplited);
+                SetReference(cmbEbookOriginal.SelectedItem as EbookStandaritzed);
 
 
                 if (!Equals(EbookActual.CapitulosEditados, default) && EbookActual.CapitulosEditados.Any((c) => !Equals(c, default)))
@@ -164,12 +165,18 @@ namespace BookStandaritzedGUI
             }
         }
 
-        private void SetReference(EbookSplited ebookSplited)
+        private void SetReference(EbookStandaritzed ebookReference)
         {
-            if (!Equals(ebookSplited, default))
+            if (!Equals(ebookReference, default))
             {
-                EbookActual.Reference = ebookSplited;
-                ParrafosCapitulosReference = EbookActual.Reference.GetContentElementsArray(cmbChapters.SelectedIndex);
+                EbookActual.Reference = ebookReference;
+                if (cmbChapters.SelectedIndex >= EbookActual.Reference.TotalChapters)
+                {
+                    cmbChapters.SelectionChanged -= cmbChapters_SelectionChanged;
+                    cmbChapters.SelectedIndex = 0;
+                    cmbChapters.SelectionChanged += cmbChapters_SelectionChanged;
+                }
+                ParrafosCapitulosReference = EbookActual.Reference.Version.GetContentElementsArray(cmbChapters.SelectedIndex);
                 cmbParrafosReference.Items.Clear();
                 cmbParrafosReference.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosReference.Length).ToArray().Convert((p) => $"párrafo referencia {p}"));
                 cmbParrafosReference.SelectedIndex = 0;

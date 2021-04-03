@@ -55,7 +55,12 @@ namespace CommonEbookPretractament
         {
             if (!Equals(Reference, default))
             {
-                ReferencePath = System.IO.Path.GetRelativePath(EbookSplited.Directory, Reference.SavePath);
+                if(!Equals(Reference.Version.EbookPath, Version.EbookPath))
+                    ReferencePath = System.IO.Path.GetRelativePath(EbookSplited.Directory, Reference.SavePath);
+            }
+            else
+            {
+                ReferencePath = default;
             }
             VersionPath   =System.IO.Path.GetRelativePath(EbookSplited.Directory,  Version.SavePath);
         }
@@ -90,6 +95,10 @@ namespace CommonEbookPretractament
             }
 
             return finished;
+        }
+        public override string ToString()
+        {
+            return $"Reference {Reference.Version.ToString()}";
         }
         public static EbookStandaritzed GetEbookStandaritzed(byte[] data) => (EbookStandaritzed)Serializador.GetObject(data);
         public static EbookStandaritzed[] GetEbookStandaritzeds()
