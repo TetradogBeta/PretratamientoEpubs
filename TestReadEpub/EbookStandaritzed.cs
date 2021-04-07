@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Gabriel.Cat.S.Binaris;
 using Gabriel.Cat.S.Extension;
@@ -63,6 +64,9 @@ namespace CommonEbookPretractament
                 ReferencePath = default;
             }
             VersionPath   =System.IO.Path.GetRelativePath(EbookSplited.Directory,  Version.SavePath);
+            for (int i = 0; i < CapitulosEditados.Length; i++)
+                if (!CapitulosEditados[i].IsRelevant)
+                    CapitulosEditados[i] = default;
         }
 
         void ISaveAndLoad.Load()
@@ -77,7 +81,7 @@ namespace CommonEbookPretractament
             {
                 Reference = new EbookStandaritzed() { Version = this.Version };
             }
-
+  
         }
         public byte[] GetBytes() => Serializador.GetBytes(this);
 
@@ -85,11 +89,20 @@ namespace CommonEbookPretractament
         {
             GetBytes().Save(SavePath);
         }
+        public Capitulo GetCapitulo(int pos)
+        {
+            if (pos < 0 || pos >= CapitulosEditados.Length)
+                throw new ArgumentOutOfRangeException();
+
+            if (Equals(CapitulosEditados[pos], default))
+                CapitulosEditados[pos] = new Capitulo();
+            return CapitulosEditados[pos];
+        }
         public bool Finished()
         {
             bool finished = Reference.TotalChapters == Version.TotalChapters;
 
-            for(int i=0;i<Reference.TotalChapters && !finished; i++)
+            for(int i=0;i<Reference.TotalChapters && finished; i++)
             {
                 finished = Equals(CapitulosEditados[i],default) || CapitulosEditados[i].Finished(Reference, Version, i);
             }
@@ -98,7 +111,7 @@ namespace CommonEbookPretractament
         }
         public override string ToString()
         {
-            return $"Reference {Reference.Version.ToString()}";
+            return $"Reference {Reference.Version}";
         }
         public static EbookStandaritzed GetEbookStandaritzed(byte[] data) => (EbookStandaritzed)Serializador.GetObject(data);
         public static EbookStandaritzed[] GetEbookStandaritzeds()
@@ -114,6 +127,8 @@ namespace CommonEbookPretractament
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
         public List<Parrafo> ParrafosEditados { get; set; } = new List<Parrafo>();
 
+        public bool IsRelevant => ParrafosEditados.Any(p => p.IsRelevant);
+
         public bool Finished(EbookStandaritzed original,EbookSplited version, int chapter)
         {
             string[] parrafosOriginal = original.Version.GetContentElementsArray(chapter);
@@ -123,15 +138,19 @@ namespace CommonEbookPretractament
             if (!finished)
             {
                 //miro los parrafos editados y si ya cuadra todo pues finished=true
+                //tener en cuenta que un parrafo puede estar por partes en la versión y al revés
             }
 
             return finished;
         }
+        
     }
     public class Parrafo : IElementoBinarioComplejo
     {
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<Parrafo>();
+        static readonly byte[] Empty = Serializador.GetBytes(new Parrafo());
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
+
         public int Chapter { get; set; }
         /// <summary>
         /// Si dos o más Parrafos tiene el mismo Index, se usará la Posición para determinar el orden
@@ -144,6 +163,11 @@ namespace CommonEbookPretractament
 
         public int Inicio { get; set; } = -1;
         public int Fin { get; set; } = -1;
+
+        public bool IsRelevant =>! GetBytes().AreEquals(Empty);
+        public byte[] GetBytes() => Serializador.GetBytes(this);
+
+
 
     }
     //quizás hará falta hacer otra clase para frase que mire el parrafo que empieza y en cual acaba...depende del tamaño del <p>

@@ -185,6 +185,7 @@ namespace BookStandaritzedGUI
                 cmbParrafosVersion.SelectedIndex = 0;
 
                 cmbParrafosVersion_SelectionChanged();
+                Title = $"Editando {EbookActual}";
 
             }
         }
