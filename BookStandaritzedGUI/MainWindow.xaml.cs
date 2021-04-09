@@ -25,7 +25,7 @@ namespace BookStandaritzedGUI
         SortedList<string,EbookStandaritzed> DicStandard { get; set; }
         SortedList<string, EbookSplited> DicSplited { get; set; }
         GroupItem Group { get; set; }
-        Parrafo ParrafoActual { get; set; }
+        Spliter ParrafoActual { get; set; }
 
         EbookStandaritzed EbookActual { get; set; }
         string[] ParrafosCapitulosReference { get;  set; }
@@ -35,7 +35,7 @@ namespace BookStandaritzedGUI
         {
             DicStandard = new SortedList<string, EbookStandaritzed>();
             DicSplited = new SortedList<string, EbookSplited>();
-            ParrafoActual = new Parrafo();
+            ParrafoActual = new Spliter();
             EbookActual = new EbookStandaritzed();
             ParrafosCapitulosReference = new string[]{ string.Empty };
             ParrafosCapitulosVersion  = new string[]{ string.Empty };
@@ -222,7 +222,7 @@ namespace BookStandaritzedGUI
             int? number = GetIfIsNumberValid(sender as TextBox);
             if (number.HasValue)
             {
-                ParrafoActual.Fin = number.Value;
+                ParrafoActual.CharFin = number.Value;
                 EbookActual.Save();
             }
         }
@@ -232,7 +232,7 @@ namespace BookStandaritzedGUI
             int? number = GetIfIsNumberValid(sender as TextBox);
             if (number.HasValue)
             {
-                ParrafoActual.Inicio = number.Value;
+                ParrafoActual.CharInicio = number.Value;
                 EbookActual.Save();
             }
         }

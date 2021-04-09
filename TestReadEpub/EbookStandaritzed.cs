@@ -125,50 +125,184 @@ namespace CommonEbookPretractament
     {
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<Capitulo>();
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
-        public List<Parrafo> ParrafosEditados { get; set; } = new List<Parrafo>();
+        public List<Spliter> ParrafosEditados { get; set; } = new List<Spliter>();
 
         public bool IsRelevant => ParrafosEditados.Any(p => p.IsRelevant);
 
         public bool Finished(EbookStandaritzed original,EbookSplited version, int chapter)
         {
-            string[] parrafosOriginal = original.Version.GetContentElementsArray(chapter);
-            string[] parrafosVersion = version.GetContentElementsArray(chapter);
-            bool finished =parrafosOriginal.Length == parrafosVersion.Length;
 
-            if (!finished)
+            return GetParrafos(version, chapter).ToArray().Length == original.Version.GetContentElementsArray(chapter).Length;
+           
+        }
+        public IEnumerable<string> GetParrafos(EbookSplited version, int chapter)
+        {
+            IEnumerable<string> parrafosVer = version.GetContentElementsArray(chapter);
+
+            if (ParrafosEditados.Count > 0)
             {
-                //miro los parrafos editados y si ya cuadra todo pues finished=true
-                //tener en cuenta que un parrafo puede estar por partes en la versión y al revés
+                ParrafosEditados.Sort();
+
+                return IGetParrafos(parrafosVer);
+            }
+            else
+            {
+                return parrafosVer;
+            }
+        }
+        //falta hacer test
+        private IEnumerable<string> IGetParrafos(IEnumerable<string> parrafosVer)
+        {//que transformaciones se hacen con los Parrafos editados para convertir la version en el original
+            StringBuilder strActual =new StringBuilder();
+            string[] strsVer = parrafosVer.ToArray();
+            int posActual = 0;
+            int strInicio = 0;
+            int strFin = -1;
+
+            //los parrafos que son identicos antes de encontrar uno editado
+            for (int i = 0; i < ParrafosEditados[0].IndexInicio; i++,posActual++)
+                yield return strsVer[i];
+            //mix parrafos saltados,splited,joined,enteros
+            for(int i = 0; i < ParrafosEditados.Count; i++)
+            {
+                if (posActual == ParrafosEditados[i].IndexInicio)
+                {
+                    if (ParrafosEditados[i].Saltar)
+                    {//salto
+                        posActual++;
+                    }
+                    else if (ParrafosEditados[i].AcabaEnElMismoIndex)
+                    {//split
+                        if (ParrafosEditados[i].CharInicio == -1)
+                            ParrafosEditados[i].CharInicio = 0;
+                        strInicio = ParrafosEditados[i].CharInicio;
+                        if (ParrafosEditados[i].CharFin == -1)
+                        {
+                            strFin = strsVer[posActual].Length;
+                        }
+                        else
+                        {
+                            strFin = ParrafosEditados[i].CharFin;
+                        }
+
+                        yield return strsVer[posActual].Substring(strInicio, strFin - strInicio);
+
+                        if (ParrafosEditados[i].CharFin == -1)
+                        {
+                            posActual++;
+                        }
+                    }
+                    else
+                    {//join
+                        strActual.Clear();
+                        //inicio
+                        if (ParrafosEditados[i].CharInicio == -1)
+                            ParrafosEditados[i].CharInicio = 0;
+                        strInicio = ParrafosEditados[i].CharInicio;
+                        strActual.Append(strsVer[posActual++].Substring(strInicio));
+                        //medio
+                        for (int j=posActual; j < ParrafosEditados[i].IndexFin - 1;j++)
+                        {
+                            strActual.AppendLine(strsVer[posActual++]);
+                        }
+
+                        //fin
+                        if (ParrafosEditados[i].CharFin == -1)
+                        {
+                            strFin = strsVer[posActual].Length;
+                        }
+                        else
+                        {
+                            strFin = ParrafosEditados[i].CharFin;
+                        }
+                        strActual.Append(strsVer[posActual++].Substring(0,strFin));
+                        yield return strActual.ToString();
+
+                    }
+                }
+                else
+                {//entero
+                    yield return strsVer[posActual++];
+                }
             }
 
-            return finished;
+            //los parrafos que son identicos después de encontrar el último editado
+            for (int i =posActual; i < strsVer.Length; i++)
+                yield return strsVer[i];
+
         }
         
     }
-    public class Parrafo : IElementoBinarioComplejo
+    public class Spliter : IElementoBinarioComplejo,ISaveAndLoad,IComparable,IComparable<Spliter>
     {
-        public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<Parrafo>();
-        static readonly byte[] Empty = Serializador.GetBytes(new Parrafo());
+        const int DEFAULT = -1;
+        public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<Spliter>();
+        static readonly byte[] Empty = Serializador.GetBytes(new Spliter());
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
 
-        public int Chapter { get; set; }
         /// <summary>
         /// Si dos o más Parrafos tiene el mismo Index, se usará la Posición para determinar el orden
         /// </summary>
-        public int Index { get; set; }
-        public int IndexInicio { get; set; } = -1;
-        public int IndexFin { get; set; } = -1;
+        public int IndexReference { get; set; } = DEFAULT;
+        public int IndexInicio { get; set; } = DEFAULT;
+        /// <summary>
+        /// Si es -1 se entiende que es el mismo que IndexInicio
+        /// </summary>
+        public int IndexFin { get; set; } = DEFAULT;
         public bool Saltar { get; set; } = false;
         public int Posicion { get; set; } = 0;
 
-        public int Inicio { get; set; } = -1;
-        public int Fin { get; set; } = -1;
+        public int CharInicio { get; set; } = DEFAULT;
+        /// <summary>
+        /// Si es -1 se entiende que es hasta el final
+        /// </summary>
+        public int CharFin { get; set; } = DEFAULT;
+
+        public bool AcabaEnElMismoIndex => IndexFin == DEFAULT || IndexInicio == IndexFin;
 
         public bool IsRelevant =>! GetBytes().AreEquals(Empty);
         public byte[] GetBytes() => Serializador.GetBytes(this);
 
+        void ISaveAndLoad.Save()
+        {
+            if (IndexInicio == IndexFin)
+                IndexFin = DEFAULT;
+            if (CharInicio == 0)
+                CharInicio = DEFAULT;
 
+        }
 
+        void ISaveAndLoad.Load()
+        {
+            if (IndexFin == DEFAULT)
+                IndexFin = IndexInicio;
+            if (CharInicio == DEFAULT)
+                CharInicio = 0;
+        }
+
+        int IComparable.CompareTo(object obj)
+        {
+            return IComparteTo(obj as Spliter);
+        }
+
+        int IComparable<Spliter>.CompareTo(Spliter other)
+        {
+            return IComparteTo(other);
+        }
+        int IComparteTo(Spliter other)
+        {//se tiene que ajustar
+            int compareTo=Saltar?other.Saltar?IndexInicio.CompareTo(other.IndexInicio):-1:1;
+
+            if (compareTo == 0)
+            {
+                compareTo = IndexReference.CompareTo(other.IndexReference);
+                if (compareTo == 0)
+                {
+                    compareTo = Posicion.CompareTo(other.Posicion) * -1;//asi los ordeno de mas pequeño a mayor
+                }
+            }
+            return compareTo;
+        }
     }
     //quizás hará falta hacer otra clase para frase que mire el parrafo que empieza y en cual acaba...depende del tamaño del <p>
 }
