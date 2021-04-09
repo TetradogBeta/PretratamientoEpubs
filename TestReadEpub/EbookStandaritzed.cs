@@ -143,94 +143,14 @@ namespace CommonEbookPretractament
             {
                 ParrafosEditados.Sort();
 
-                return IGetParrafos(parrafosVer);
+                return Spliter.GetParts(ParrafosEditados,parrafosVer);
             }
             else
             {
                 return parrafosVer;
             }
         }
-        //falta hacer test
-        private IEnumerable<string> IGetParrafos(IEnumerable<string> parrafosVer)
-        {//que transformaciones se hacen con los Parrafos editados para convertir la version en el original
-            StringBuilder strActual =new StringBuilder();
-            string[] strsVer = parrafosVer.ToArray();
-            int posActual = 0;
-            int strInicio = 0;
-            int strFin = -1;
-
-            //los parrafos que son identicos antes de encontrar uno editado
-            for (int i = 0; i < ParrafosEditados[0].IndexInicio; i++,posActual++)
-                yield return strsVer[i];
-            //mix parrafos saltados,splited,joined,enteros
-            for(int i = 0; i < ParrafosEditados.Count; i++)
-            {
-                if (posActual == ParrafosEditados[i].IndexInicio)
-                {
-                    if (ParrafosEditados[i].Saltar)
-                    {//salto
-                        posActual++;
-                    }
-                    else if (ParrafosEditados[i].AcabaEnElMismoIndex)
-                    {//split
-                        if (ParrafosEditados[i].CharInicio == -1)
-                            ParrafosEditados[i].CharInicio = 0;
-                        strInicio = ParrafosEditados[i].CharInicio;
-                        if (ParrafosEditados[i].CharFin == -1)
-                        {
-                            strFin = strsVer[posActual].Length;
-                        }
-                        else
-                        {
-                            strFin = ParrafosEditados[i].CharFin;
-                        }
-
-                        yield return strsVer[posActual].Substring(strInicio, strFin - strInicio);
-
-                        if (ParrafosEditados[i].CharFin == -1)
-                        {
-                            posActual++;
-                        }
-                    }
-                    else
-                    {//join
-                        strActual.Clear();
-                        //inicio
-                        if (ParrafosEditados[i].CharInicio == -1)
-                            ParrafosEditados[i].CharInicio = 0;
-                        strInicio = ParrafosEditados[i].CharInicio;
-                        strActual.Append(strsVer[posActual++].Substring(strInicio));
-                        //medio
-                        for (int j=posActual; j < ParrafosEditados[i].IndexFin - 1;j++)
-                        {
-                            strActual.AppendLine(strsVer[posActual++]);
-                        }
-
-                        //fin
-                        if (ParrafosEditados[i].CharFin == -1)
-                        {
-                            strFin = strsVer[posActual].Length;
-                        }
-                        else
-                        {
-                            strFin = ParrafosEditados[i].CharFin;
-                        }
-                        strActual.Append(strsVer[posActual++].Substring(0,strFin));
-                        yield return strActual.ToString();
-
-                    }
-                }
-                else
-                {//entero
-                    yield return strsVer[posActual++];
-                }
-            }
-
-            //los parrafos que son identicos después de encontrar el último editado
-            for (int i =posActual; i < strsVer.Length; i++)
-                yield return strsVer[i];
-
-        }
+        
         
     }
     public class Spliter : IElementoBinarioComplejo,ISaveAndLoad,IComparable,IComparable<Spliter>
@@ -302,6 +222,91 @@ namespace CommonEbookPretractament
                 }
             }
             return compareTo;
+        }
+
+        //falta hacer test
+        public static IEnumerable<string> GetParts(IList<Spliter> parts, IEnumerable<string> parrafosVer)
+        {//que transformaciones se hacen con los Parrafos editados para convertir la version en el original
+            //asi se puede usar para dividir frases
+            StringBuilder strActual = new StringBuilder();
+            string[] strsVer = parrafosVer.ToArray();
+            int posActual = 0;
+            int strInicio = 0;
+            int strFin = -1;
+
+            parts.SortByQuickSort();
+
+            //los parrafos que son identicos antes de encontrar uno editado
+            for (int i = 0; i < parts[0].IndexInicio; i++, posActual++)
+                yield return strsVer[i];
+            //mix parrafos saltados,splited,joined,enteros
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (posActual == parts[i].IndexInicio)
+                {
+                    if (parts[i].Saltar)
+                    {//salto
+                        posActual++;
+                    }
+                    else if (parts[i].AcabaEnElMismoIndex)
+                    {//split
+                        if (parts[i].CharInicio == -1)
+                            parts[i].CharInicio = 0;
+                        strInicio = parts[i].CharInicio;
+                        if (parts[i].CharFin == -1)
+                        {
+                            strFin = strsVer[posActual].Length;
+                        }
+                        else
+                        {
+                            strFin = parts[i].CharFin;
+                        }
+
+                        yield return strsVer[posActual].Substring(strInicio, strFin - strInicio);
+
+                        if (parts[i].CharFin == -1)
+                        {
+                            posActual++;
+                        }
+                    }
+                    else
+                    {//join
+                        strActual.Clear();
+                        //inicio
+                        if (parts[i].CharInicio == -1)
+                            parts[i].CharInicio = 0;
+                        strInicio = parts[i].CharInicio;
+                        strActual.Append(strsVer[posActual++].Substring(strInicio));
+                        //medio
+                        for (int j = posActual; j < parts[i].IndexFin - 1; j++)
+                        {
+                            strActual.AppendLine(strsVer[posActual++]);
+                        }
+
+                        //fin
+                        if (parts[i].CharFin == -1)
+                        {
+                            strFin = strsVer[posActual].Length;
+                        }
+                        else
+                        {
+                            strFin = parts[i].CharFin;
+                        }
+                        strActual.Append(strsVer[posActual++].Substring(0, strFin));
+                        yield return strActual.ToString();
+
+                    }
+                }
+                else
+                {//entero
+                    yield return strsVer[posActual++];
+                }
+            }
+
+            //los parrafos que son identicos después de encontrar el último editado
+            for (int i = posActual; i < strsVer.Length; i++)
+                yield return strsVer[i];
+
         }
     }
     //quizás hará falta hacer otra clase para frase que mire el parrafo que empieza y en cual acaba...depende del tamaño del <p>
