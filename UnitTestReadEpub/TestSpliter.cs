@@ -175,5 +175,72 @@ namespace UnitTestReadEpub
             Assert.IsTrue(resultadoEsperado.AreEquals(resultado));
 
         }
+       
+        [TestMethod]
+        public void TestMix()
+        {
+            //falta saltando
+            //strings del medio(entre strings editadas hay otras) que se tienen que poner enteras
+            //split,entera,salto,join,resto
+            string[] textos =
+            {
+                "Texto0",
+                "Texto1Texto2",
+                "Texto3",
+                "Texto4Saltado",
+                "Texto5P1",
+                "Texto5P2Texto6TextoOmitido",
+                "Texto7",
+                "Texto8"
+            };
+            string[] resultadoEsperado ={
+                textos[0],
+                textos[1].Substring(0,6),
+                textos[1].Substring(6),
+                textos[2],
+                //salto textos[3],
+                textos[4]+textos[5].Substring(0,8),
+                textos[5].Substring(8,6),
+                textos[6],
+                textos[7]
+            };
+            List<Spliter> spliters = new List<Spliter>
+            {
+                new Spliter()
+                {
+                    IndexInicio=1,
+                    CharFin=6
+                },
+                new Spliter()
+                {
+                    IndexInicio=1,
+                    CharInicio=6
+                },
+                new Spliter()
+                {
+                    IndexInicio=3,
+                    Saltar=true
+                },
+                new Spliter()
+                {
+                    IndexInicio=4,
+                    IndexFin=5,
+                    CharFin=8
+                },
+                new Spliter()
+                {
+                    IndexInicio=5,
+                    CharInicio=8,
+                    CharFin=8+6
+                },
+                new Spliter()
+                {
+                    IndexInicio=5,
+                    Saltar=true
+                }
+            };
+            string[] resultado = Spliter.GetParts(spliters, textos).ToArray();
+            Assert.IsTrue(resultadoEsperado.AreEquals(resultado));
+        }
     }
 }

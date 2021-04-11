@@ -257,8 +257,8 @@ namespace CommonEbookPretractament
 
            // parts.Sort();//me da problemas al momento de ordenarlo...
             //los parrafos que son identicos antes de encontrar uno editado
-            for (int i = 0; i < parts[0].IndexInicio; i++, posActual++)
-                yield return strsVer[i];
+            for (int i = 0; i < parts[0].IndexInicio; i++)
+                yield return strsVer[posActual++];
             //mix parrafos saltados,splited,joined,enteros
             for (int i = 0; i < parts.Count; i++)
             {
@@ -327,7 +327,9 @@ namespace CommonEbookPretractament
                 }
                 else
                 {//entero
+                    i--;//se que no es muy correcto pero es una solución...
                     yield return strsVer[posActual++];
+            
                 }
             }
 
