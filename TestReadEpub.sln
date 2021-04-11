@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestReadEpub", "TestReadEpu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BooksSplitedGUI", "BooksSplitedGUI\BooksSplitedGUI.csproj", "{BCA02534-DA79-463E-891D-9135E123AA20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BookStandaritzedGUI", "BookStandaritzedGUI\BookStandaritzedGUI.csproj", "{AFF981A5-9371-4397-9935-497640460043}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookStandaritzedGUI", "BookStandaritzedGUI\BookStandaritzedGUI.csproj", "{AFF981A5-9371-4397-9935-497640460043}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestReadEpub", "UnitTestReadEpub\UnitTestReadEpub.csproj", "{7D4352B5-835E-4E88-8741-1460C28F9EFD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{AFF981A5-9371-4397-9935-497640460043}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFF981A5-9371-4397-9935-497640460043}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFF981A5-9371-4397-9935-497640460043}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D4352B5-835E-4E88-8741-1460C28F9EFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D4352B5-835E-4E88-8741-1460C28F9EFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D4352B5-835E-4E88-8741-1460C28F9EFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D4352B5-835E-4E88-8741-1460C28F9EFD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

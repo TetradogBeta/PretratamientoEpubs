@@ -65,7 +65,7 @@ namespace CommonEbookPretractament
             }
             VersionPath   =System.IO.Path.GetRelativePath(EbookSplited.Directory,  Version.SavePath);
             for (int i = 0; i < CapitulosEditados.Length; i++)
-                if (!CapitulosEditados[i].IsRelevant)
+                if (!Equals(CapitulosEditados[i],default) && !CapitulosEditados[i].IsRelevant)
                     CapitulosEditados[i] = default;
         }
 
@@ -215,27 +215,47 @@ namespace CommonEbookPretractament
 
             if (compareTo == 0)
             {
-                compareTo = IndexReference.CompareTo(other.IndexReference);
+                compareTo = IndexReference.CompareTo(other.IndexReference) * -1;
                 if (compareTo == 0)
                 {
-                    compareTo = Posicion.CompareTo(other.Posicion) * -1;//asi los ordeno de mas pequeño a mayor
+                    if (CharInicio == -1)
+                        compareTo = 1;
+                    else if (other.CharInicio == -1)
+                        compareTo = -1;
+                    else
+                        compareTo = CharInicio.CompareTo(other.CharInicio) *-1;//asi los ordeno de mas pequeño a mayor
+                    if (compareTo == 0)
+                    {
+                        if (CharFin == -1)
+                            compareTo = -1;
+                        else if (other.CharFin == -1)
+                            compareTo = 1;
+                        else
+                            compareTo = CharFin.CompareTo(other.CharFin) * -1;//asi los ordeno de mas pequeño a mayor
+                        if (compareTo == 0)
+                        {
+                            compareTo = Posicion.CompareTo(other.Posicion) * -1;//asi los ordeno de mas pequeño a mayor
+
+                        }
+
+                    }
                 }
             }
             return compareTo;
         }
 
-        //falta hacer test
-        public static IEnumerable<string> GetParts(IList<Spliter> parts, IEnumerable<string> parrafosVer)
+ 
+        public static IEnumerable<string> GetParts(List<Spliter> parts, IEnumerable<string> textosATratar,string strJoin="")
         {//que transformaciones se hacen con los Parrafos editados para convertir la version en el original
-            //asi se puede usar para dividir frases
+         //asi se puede usar para dividir frases
+
+            int strInicio;
+            int strFin;
             StringBuilder strActual = new StringBuilder();
-            string[] strsVer = parrafosVer.ToArray();
+            string[] strsVer = textosATratar.ToArray();
             int posActual = 0;
-            int strInicio = 0;
-            int strFin = -1;
 
-            parts.SortByQuickSort();
-
+           // parts.Sort();//me da problemas al momento de ordenarlo...
             //los parrafos que son identicos antes de encontrar uno editado
             for (int i = 0; i < parts[0].IndexInicio; i++, posActual++)
                 yield return strsVer[i];
@@ -264,6 +284,7 @@ namespace CommonEbookPretractament
 
                         yield return strsVer[posActual].Substring(strInicio, strFin - strInicio);
 
+
                         if (parts[i].CharFin == -1)
                         {
                             posActual++;
@@ -278,9 +299,10 @@ namespace CommonEbookPretractament
                         strInicio = parts[i].CharInicio;
                         strActual.Append(strsVer[posActual++].Substring(strInicio));
                         //medio
-                        for (int j = posActual; j < parts[i].IndexFin - 1; j++)
+                        for (int j = 0,f= parts[i].IndexFin - parts[i].IndexInicio -1; j < f; j++)
                         {
-                            strActual.AppendLine(strsVer[posActual++]);
+                            strActual.Append(strJoin);
+                            strActual.Append(strsVer[posActual++]);
                         }
 
                         //fin
@@ -292,7 +314,13 @@ namespace CommonEbookPretractament
                         {
                             strFin = parts[i].CharFin;
                         }
-                        strActual.Append(strsVer[posActual++].Substring(0, strFin));
+                        if (strActual.ToString().Length > 0)
+                            strActual.Append(strJoin);
+                        strActual.Append(strsVer[posActual].Substring(0, strFin));
+                        if (parts[i].CharFin == -1)
+                        {
+                            posActual++;
+                        }
                         yield return strActual.ToString();
 
                     }
