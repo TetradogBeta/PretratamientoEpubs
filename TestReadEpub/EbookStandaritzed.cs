@@ -18,7 +18,7 @@ namespace CommonEbookPretractament
             if (!System.IO.Directory.Exists(Directory))
                 System.IO.Directory.CreateDirectory(Directory);
         }
-        public EbookStandaritzed() { }
+        public EbookStandaritzed() { CapitulosEditados = new Capitulo[1]; }
         public EbookStandaritzed(EbookSplited ebookSplitedVersion,EbookSplited ebookSplitedReference = default)
         {
             if (Equals(ebookSplitedVersion, default))

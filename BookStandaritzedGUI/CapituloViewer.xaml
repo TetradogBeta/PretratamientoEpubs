@@ -21,7 +21,7 @@
                 <RowDefinition/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
-            <RichTextBox x:Name="rtbVersion"  Background="AntiqueWhite"/>
+            <RichTextBox x:Name="rtbVersion"  Background="AntiqueWhite" SelectionChanged="rtbVersion_SelectionChanged" />
             <RichTextBox x:Name="rtbOriginal" Grid.Column="1" Background="AliceBlue"/>
 
             <ComboBox x:Name="cmbParrafosVersion" Grid.Row="1"  SelectionChanged="cmbParrafosVersion_SelectionChanged"/>
@@ -48,8 +48,8 @@
                     
                     -->
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock  Text="Index actual"/>
-                    <TextBlock x:Name="tbIndex"/>
+                    <TextBlock  Text="Info"/>
+                    <TextBlock x:Name="tbInfo"/>
                 </StackPanel>
                 <CheckBox x:Name="chkbSaltarParrafo" Content="Saltar Parrafo" Checked="chkbSaltarParrafo_Checked" Unchecked="chkbSaltarParrafo_Unchecked"/>
                 <StackPanel Orientation="Horizontal">
@@ -73,7 +73,9 @@
                 </StackPanel>
 
 
-                <Grid Height="49"/>
+                <Grid Height="19"/>
+                <Button x:Name="btnEliminar" Content="Eliminar" Click="btnEliminar_Click"/>
+                <Grid Height="8"/>
                 <Button x:Name="btnNuevo" Content="Nuevo" Click="btnNuevo_Click"/>
 
 

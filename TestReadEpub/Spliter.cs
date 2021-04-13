@@ -110,75 +110,78 @@ namespace CommonEbookPretractament
             //mix parrafos saltados,splited,joined,enteros
             for (int i = 0; i < parts.Count; i++)
             {
-                if (posActual == parts[i].IndexInicio)
+                if (parts[i].IsRelevant)
                 {
-                    if (parts[i].Saltar)
-                    {//salto
-                        if(parts[i].CharFin == -1 || parts[i].CharFin == strsVer[posActual].Length)
-                           posActual++;
-                    }
-                    else if (parts[i].AcabaEnElMismoIndex)
-                    {//split
-                        if (parts[i].CharInicio == -1)
-                            parts[i].CharInicio = 0;
-                        strInicio = parts[i].CharInicio;
-                        if (parts[i].CharFin == -1)
-                        {
-                            strFin = strsVer[posActual].Length;
+                    if (posActual == parts[i].IndexInicio)
+                    {
+                        if (parts[i].Saltar)
+                        {//salto
+                            if (parts[i].CharFin == -1 || parts[i].CharFin == strsVer[posActual].Length)
+                                posActual++;
+                        }
+                        else if (parts[i].AcabaEnElMismoIndex)
+                        {//split
+                            if (parts[i].CharInicio == -1)
+                                parts[i].CharInicio = 0;
+                            strInicio = parts[i].CharInicio;
+                            if (parts[i].CharFin == -1)
+                            {
+                                strFin = strsVer[posActual].Length;
+                            }
+                            else
+                            {
+                                strFin = parts[i].CharFin;
+                            }
+
+                            yield return strsVer[posActual].Substring(strInicio, strFin - strInicio);
+
+
+                            if (parts[i].CharFin == -1)
+                            {
+                                posActual++;
+                            }
                         }
                         else
-                        {
-                            strFin = parts[i].CharFin;
-                        }
+                        {//join
+                            strActual.Clear();
+                            //inicio
+                            if (parts[i].CharInicio == -1)
+                                parts[i].CharInicio = 0;
+                            strInicio = parts[i].CharInicio;
+                            strActual.Append(strsVer[posActual++].Substring(strInicio));
+                            //medio
+                            for (int j = 0, f = parts[i].IndexFin - parts[i].IndexInicio - 1; j < f; j++)
+                            {
+                                strActual.Append(strJoin);
+                                strActual.Append(strsVer[posActual++]);
+                            }
 
-                        yield return strsVer[posActual].Substring(strInicio, strFin - strInicio);
+                            //fin
+                            if (parts[i].CharFin == -1)
+                            {
+                                strFin = strsVer[posActual].Length;
+                            }
+                            else
+                            {
+                                strFin = parts[i].CharFin;
+                            }
+                            if (strActual.ToString().Length > 0)
+                                strActual.Append(strJoin);
+                            strActual.Append(strsVer[posActual].Substring(0, strFin));
+                            if (parts[i].CharFin == -1)
+                            {
+                                posActual++;
+                            }
+                            yield return strActual.ToString();
 
-
-                        if (parts[i].CharFin == -1)
-                        {
-                            posActual++;
                         }
                     }
                     else
-                    {//join
-                        strActual.Clear();
-                        //inicio
-                        if (parts[i].CharInicio == -1)
-                            parts[i].CharInicio = 0;
-                        strInicio = parts[i].CharInicio;
-                        strActual.Append(strsVer[posActual++].Substring(strInicio));
-                        //medio
-                        for (int j = 0,f= parts[i].IndexFin - parts[i].IndexInicio -1; j < f; j++)
-                        {
-                            strActual.Append(strJoin);
-                            strActual.Append(strsVer[posActual++]);
-                        }
-
-                        //fin
-                        if (parts[i].CharFin == -1)
-                        {
-                            strFin = strsVer[posActual].Length;
-                        }
-                        else
-                        {
-                            strFin = parts[i].CharFin;
-                        }
-                        if (strActual.ToString().Length > 0)
-                            strActual.Append(strJoin);
-                        strActual.Append(strsVer[posActual].Substring(0, strFin));
-                        if (parts[i].CharFin == -1)
-                        {
-                            posActual++;
-                        }
-                        yield return strActual.ToString();
+                    {//entero
+                        i--;//se que no es muy correcto pero es una solución...
+                        yield return strsVer[posActual++];
 
                     }
-                }
-                else
-                {//entero
-                    i--;//se que no es muy correcto pero es una solución...
-                    yield return strsVer[posActual++];
-            
                 }
             }
 

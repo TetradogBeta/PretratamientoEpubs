@@ -19,7 +19,8 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class VisorCapitiloSpliter : UserControl
     {
-        private List<Spliter> capitulo;
+
+        private int chapter;
 
         public event EventHandler<SpliterEventArgs> SpliterSelected;
 
@@ -27,20 +28,20 @@ namespace BookStandaritzedGUI
         {
             InitializeComponent();
         }
-        public List<Spliter> Capitulo { 
-            get => capitulo;
-            set {
-
-                capitulo = value;
-                Refresh();
-            }
-        }
+        public List<Spliter> Parrafos => Ebook.GetCapitulo(Chapter).ParrafosEditados;
+        public int Chapter { get => chapter; set { chapter = value; Refresh(); } }
+        public EbookStandaritzed Ebook { get; set; }
 
         public void Refresh()
         {
             parrafosCapitulo.Children.Clear();
             //añado los capitulos
             //onClick SpliterSelected
+        }
+
+        private void btnViewProgress_Click(object sender, RoutedEventArgs e)
+        {
+            new ProgressViewer(Ebook,Chapter).ShowDialog();
         }
     }
 

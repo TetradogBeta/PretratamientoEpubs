@@ -21,14 +21,14 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class CapituloViewer : UserControl
     {
-        private EbookStandaritzed ebookActual;
         private Spliter parrafoActual;
 
         public CapituloViewer()
         {
             InitializeComponent();
-            ParrafoActual = new Spliter();
+        
             EbookActual = new EbookStandaritzed();
+            ParrafoActual = new Spliter();
             ParrafosCapitulosReference = new string[] { string.Empty };
             ParrafosCapitulosVersion = new string[] { string.Empty };
 
@@ -52,23 +52,30 @@ namespace BookStandaritzedGUI
 
                 chkbSaltarParrafo.IsChecked = parrafoActual.Saltar;
 
+                if(!visorCapitiloSpliter.Parrafos.Contains(parrafoActual))
+                {
+                    visorCapitiloSpliter.Parrafos.Add(parrafoActual);
+                    visorCapitiloSpliter.Refresh();
+                }
+
             }
         }
         public EbookStandaritzed EbookActual
         {
-            get => ebookActual;
+            get => visorCapitiloSpliter.Ebook;
             set
             {
-                ebookActual = value;
+                visorCapitiloSpliter.Ebook = value;
+                ParrafoActual = new Spliter();
                 if (!Equals(MainWindow.Group, default))
                 {
                     //cargo el libro actual
                     cmbEbookOriginal.SelectionChanged -= cmbEbookOriginal_SelectionChanged;
                     cmbEbookOriginal.ItemsSource = MainWindow.Group.Items;
-                    cmbEbookOriginal.SelectedIndex = cmbEbookOriginal.Items.IndexOf(ebookActual.Reference.Version);
+                    cmbEbookOriginal.SelectedIndex = cmbEbookOriginal.Items.IndexOf(EbookActual.Reference.Version);
                     cmbEbookOriginal.SelectionChanged += cmbEbookOriginal_SelectionChanged;
                     cmbChapters.Items.Clear();
-                    cmbChapters.Items.AddRange(Enumerable.Range(0, ebookActual.TotalChapters).ToArray().Convert((p) => $"Capitulo {p}"));
+                    cmbChapters.Items.AddRange(Enumerable.Range(0, EbookActual.TotalChapters).ToArray().Convert((p) => $"Capítulo {p}"));
                     cmbEbookOriginal_SelectionChanged();
                 }
 
@@ -78,6 +85,7 @@ namespace BookStandaritzedGUI
         {
 
             EbookActual.Save();
+            visorCapitiloSpliter.Refresh();
 
             CheckChapterFinished();
 
@@ -198,7 +206,7 @@ namespace BookStandaritzedGUI
                 cmbParrafosReference.SelectedIndex = 0;
                 cmbParrafosVersion.SelectedIndex = 0;
 
-                visorCapitiloSpliter.Capitulo = EbookActual.GetCapitulo(cmbChapters.SelectedIndex).ParrafosEditados;
+                visorCapitiloSpliter.Chapter = cmbChapters.SelectedIndex;
                 CheckChapterFinished();
 
             }
@@ -207,9 +215,11 @@ namespace BookStandaritzedGUI
         private void cmbEbookOriginal_SelectionChanged(object sender=null, SelectionChangedEventArgs e=null)
         {
             EbookActual.Reference = MainWindow.GetReference(cmbEbookOriginal.SelectedItem as EbookSplited);
-            if (cmbChapters.SelectedIndex != 0)
-                cmbChapters.SelectedIndex = 0;
-            else cmbChapters_SelectionChanged();
+           
+            cmbChapters.SelectionChanged -= cmbChapters_SelectionChanged;
+            cmbChapters.SelectedIndex = 0;
+            cmbChapters.SelectionChanged += cmbChapters_SelectionChanged;
+            cmbChapters_SelectionChanged();
 
 
         }
@@ -223,11 +233,27 @@ namespace BookStandaritzedGUI
         {
             Spliter spliter = new Spliter();
 
-            visorCapitiloSpliter.Capitulo.Add(spliter);
+            visorCapitiloSpliter.Parrafos.Add(spliter);
             visorCapitiloSpliter.Refresh();
 
             ParrafoActual = spliter;
 
+        }
+
+        private void btnEliminar_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("¿Está seguro de borrarlo?", "Atención", MessageBoxButton.YesNo,MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                visorCapitiloSpliter.Parrafos.Remove(ParrafoActual);
+                visorCapitiloSpliter.Refresh();
+                ParrafoActual = new Spliter();
+            }
+        }
+
+        private void rtbVersion_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            Point ptrSelection = rtbVersion.GetSelectionRange();
+            tbInfo.Text = $": P {cmbParrafosVersion.SelectedIndex}, Inicio = {ptrSelection.X}, Fin = {ptrSelection.Y}";
         }
     }
 }

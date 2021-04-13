@@ -1,6 +1,7 @@
 ﻿using CommonEbookPretractament;
 using Gabriel.Cat.S.Extension;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -62,7 +63,7 @@ namespace BookStandaritzedGUI
             Group = default;
             foreach (var title in dic)
             {
-                Group = new GroupItem(new KeyValuePair<string, IList<object>>(title.Key, title.Value.Convert((item) => (object)item)));
+                Group = new GroupItem(new KeyValuePair<string, IList>(title.Key, title.Value));
                 Group.Selected += (s, e) =>
                 {
                     if (!Equals(capituloViewer.EbookActual.Version, e.Object))
@@ -84,11 +85,11 @@ namespace BookStandaritzedGUI
         }
         private void SetEbookActual(EbookSplited ebook)
         {
-            if (!Equals(ebook, default))
+            EbookStandaritzed ebookStandaritzed = GetReference(ebook);
+            if (!Equals(ebookStandaritzed, default))
             {
-                if (!DicStandard.ContainsKey(ebook.RelativeEbookPath))
-                    DicStandard.Add(ebook.RelativeEbookPath, new EbookStandaritzed(ebook));
-                capituloViewer.EbookActual = DicStandard[ebook.RelativeEbookPath];
+
+                capituloViewer.EbookActual = ebookStandaritzed;
 
             }
         }
