@@ -61,6 +61,7 @@ namespace CommonEbookPretractament
                 ReferencePath = default;
             }
             VersionPath   =System.IO.Path.GetRelativePath(EbookSplited.Directory,  Version.SavePath);
+
             for (int i = 0; i < CapitulosEditados.Length; i++)
                 if (!Equals(CapitulosEditados[i],default) && !CapitulosEditados[i].IsRelevant)
                     CapitulosEditados[i] = default;
@@ -114,9 +115,9 @@ namespace CommonEbookPretractament
         public static EbookStandaritzed[] GetEbookStandaritzeds()
         {
             FileInfo[] files = new DirectoryInfo(Directory).GetFiles();
-            return files.Convert((f) => (EbookStandaritzed)Serializador.GetObject(f.GetBytes()));
+            return files.Convert((f) => GetEbookStandaritzed(f.GetBytes()));
 
         }
     }
-    //quizás hará falta hacer otra clase para frase que mire el parrafo que empieza y en cual acaba...depende del tamaño del <p>
+
 }

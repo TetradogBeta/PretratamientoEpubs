@@ -1,0 +1,92 @@
+﻿<UserControl x:Class="BookStandaritzedGUI.CapituloViewer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BookStandaritzedGUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800" Background="White">
+    <Grid >
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="170"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="30"/>
+            </Grid.RowDefinitions>
+            <RichTextBox x:Name="rtbVersion"  Background="AntiqueWhite"/>
+            <RichTextBox x:Name="rtbOriginal" Grid.Column="1" Background="AliceBlue"/>
+
+            <ComboBox x:Name="cmbParrafosVersion" Grid.Row="1"  SelectionChanged="cmbParrafosVersion_SelectionChanged"/>
+            <ComboBox x:Name="cmbParrafosReference" Grid.Row="1" Grid.Column="1" SelectionChanged="cmbParrafosReference_SelectionChanged"/>
+
+
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MaxWidth="250"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+                <!--aqui configuro el parrafo, permite editar y crear
+                    
+                            Index 
+                            IndexInicio=-1
+                            IndexFin  = -1;
+                            Saltar  = false;
+                            Posicion  = 0;
+
+                            Inicio = -1;
+                            Fin  = -1;
+                    
+                    -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock  Text="Index actual"/>
+                    <TextBlock x:Name="tbIndex"/>
+                </StackPanel>
+                <CheckBox x:Name="chkbSaltarParrafo" Content="Saltar Parrafo" Checked="chkbSaltarParrafo_Checked" Unchecked="chkbSaltarParrafo_Unchecked"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Index Inicio"/>
+                    <TextBox x:Name="txtIndexInicio" Width="150" TextChanged="txtIndexInicio_TextChanged"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Index Fin"/>
+                    <Grid Width="12"/>
+                    <TextBox x:Name="txtIndexFin" Width="150" TextChanged="txtIndexFin_TextChanged" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Inicio"/>
+                    <Grid Width="32"/>
+                    <TextBox x:Name="txtInicio" Width="150" TextChanged="txtInicio_TextChanged"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Fin"/>
+                    <Grid Width="44"/>
+                    <TextBox x:Name="txtFin" Width="150" TextChanged="txtFin_TextChanged"/>
+                </StackPanel>
+
+
+                <Grid Height="49"/>
+                <Button x:Name="btnNuevo" Content="Nuevo" Click="btnNuevo_Click"/>
+
+
+            </StackPanel>
+            <local:VisorCapitiloSpliter x:Name="visorCapitiloSpliter"  Grid.Column="1" SpliterSelected="visorCapitiloSpliter_SpliterSelected" />
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition  MaxWidth="250"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="cmbChapters" SelectionChanged="cmbChapters_SelectionChanged"/>
+            <ComboBox x:Name="cmbEbookOriginal" SelectionChanged="cmbEbookOriginal_SelectionChanged" Grid.Column="1"/>
+        </Grid>
+    </Grid>
+</UserControl>

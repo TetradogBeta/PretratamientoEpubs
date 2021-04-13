@@ -22,23 +22,18 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        SortedList<string,EbookStandaritzed> DicStandard { get; set; }
-        SortedList<string, EbookSplited> DicSplited { get; set; }
-        GroupItem Group { get; set; }
-        Spliter ParrafoActual { get; set; }
+        public static SortedList<string,EbookStandaritzed> DicStandard { get; set; }
+        public static SortedList<string, EbookSplited> DicSplited { get; set; }
+        public static GroupItem Group { get; set; }
 
-        EbookStandaritzed EbookActual { get; set; }
-        string[] ParrafosCapitulosReference { get;  set; }
-        string[] ParrafosCapitulosVersion { get; set; }
+
+
 
         public  MainWindow()
         {
             DicStandard = new SortedList<string, EbookStandaritzed>();
             DicSplited = new SortedList<string, EbookSplited>();
-            ParrafoActual = new Spliter();
-            EbookActual = new EbookStandaritzed();
-            ParrafosCapitulosReference = new string[]{ string.Empty };
-            ParrafosCapitulosVersion  = new string[]{ string.Empty };
+
             InitializeComponent();
 
             Load();
@@ -49,6 +44,7 @@ namespace BookStandaritzedGUI
             EbookSplited[] ebooksSpited = EbookSplited.GetEbookSpliteds();
             EbookStandaritzed[] ebooksStandaritzed = EbookStandaritzed.GetEbookStandaritzeds();
             SortedList<string, List<EbookSplited>> dic = new SortedList<string, List<EbookSplited>>();
+         
 
             lstEbookSplited.Items.Clear();
             DicSplited.Clear();
@@ -69,204 +65,45 @@ namespace BookStandaritzedGUI
                 Group = new GroupItem(new KeyValuePair<string, IList<object>>(title.Key, title.Value.Convert((item) => (object)item)));
                 Group.Selected += (s, e) =>
                 {
-                    if (!Equals(EbookActual.Version, e.Object))
+                    if (!Equals(capituloViewer.EbookActual.Version, e.Object))
                     {
                         if (Group != default)
                         {
                             Group.UnselectItem();
                         }
                         Group = s as GroupItem;
-                        SetEbookSplited(e.Object as EbookSplited);
+                        SetEbookActual(e.Object as EbookSplited);
                     }
                 };
                 lstEbookSplited.Items.Add(Group);
             }
             if (!Equals(Group, default))
             {
-                SetEbookSplited(Group.FirstOrDefault as EbookSplited);
+               SetEbookActual(Group.FirstOrDefault as EbookSplited);
             }
         }
-
-        private void SetEbookSplited(EbookSplited ebookSpited)
+        private void SetEbookActual(EbookSplited ebook)
         {
-            if (!Equals(ebookSpited, default) && !Equals(EbookActual.Version,ebookSpited))
+            if (!Equals(ebook, default))
             {
-                if (!DicStandard.ContainsKey(ebookSpited.ToString()))
-                {
-                    EbookActual = new EbookStandaritzed(ebookSpited);
-                    DicStandard.Add(ebookSpited.ToString(), EbookActual);
-                }
-                else
-                {
-                    EbookActual = DicStandard[ebookSpited.ToString()];
-                }
+                if (!DicStandard.ContainsKey(ebook.RelativeEbookPath))
+                    DicStandard.Add(ebook.RelativeEbookPath, new EbookStandaritzed(ebook));
+                capituloViewer.EbookActual = DicStandard[ebook.RelativeEbookPath];
 
-                cmbEbookOriginal.SelectedIndex = cmbEbookOriginal.Items.IndexOf(ebookSpited);
-                cmbChapters.Items.Clear();
-                cmbChapters.Items.AddRange(Enumerable.Range(0, ebookSpited.TotalChapters).ToArray().Convert((c)=>$"capitulo {c}"));
-                cmbChapters.SelectedIndex = 0;
-                cmbEbookOriginal.Items.Clear();
-                cmbEbookOriginal.Items.AddRange(Group.Items);
-                cmbEbookOriginal.SelectedItem = ebookSpited;
-                Group.SelectedItem = ebookSpited;
             }
-          
         }
 
-        private void cmbParrafosReference_SelectionChanged(object sender=null, SelectionChangedEventArgs e=null)
+        public static EbookStandaritzed GetReference(EbookSplited ebook)
         {
-            if(cmbParrafosReference.SelectedIndex>=0)
-            rtbOriginal.SetText(ParrafosCapitulosReference[cmbParrafosReference.SelectedIndex]);
-        }
-
-        private void cmbParrafosVersion_SelectionChanged(object sender = null, SelectionChangedEventArgs e=null)
-        {
-            if (cmbParrafosVersion.SelectedIndex >= 0)
-                rtbVersion.SetText(ParrafosCapitulosVersion[cmbParrafosVersion.SelectedIndex]);
-        }
-
-        private void cmbChapters_SelectionChanged(object sender = null, SelectionChangedEventArgs e = null)
-        {
-
-            if (cmbChapters.SelectedIndex >= 0)
+            EbookStandaritzed ebookStandaritzed = default;
+            if (!Equals(ebook, default))
             {
-
-                ParrafosCapitulosVersion = EbookActual.Version.GetContentElementsArray(cmbChapters.SelectedIndex);
-
-
-                cmbParrafosVersion.Items.Clear();
-
-                cmbParrafosVersion.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosVersion.Length).ToArray().Convert((p) => $"párrafo a mirar {p}"));
-
-                cmbParrafosVersion.SelectedIndex = 0;
-
-                cmbParrafosVersion_SelectionChanged();
-                SetReference(EbookActual.Reference);
-            }
-        }
-
-        private void cmbEbookOriginal_SelectionChanged(object sender = null, SelectionChangedEventArgs e = null)
-        {
-
-            if (cmbEbookOriginal.Items.Count > 0)
-            {
-                SetReference(cmbEbookOriginal.SelectedItem as EbookStandaritzed);
-
-
-                if (!Equals(EbookActual.CapitulosEditados, default) && EbookActual.CapitulosEditados.Any((c) => !Equals(c, default)))
-                {
-                    //a ver si quiere borrar los capitulos editados
-                    if (MessageBox.Show("Desea eliminar los capitulos editados?podria ser que no coincidieran con el anterior...", "Atención", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    {
-                        EbookActual.CapitulosEditados = new Capitulo[EbookActual.CapitulosEditados.Length];
-                    }
-                }
-                EbookActual.Save();
-            }
-        }
-
-        private void SetReference(EbookStandaritzed ebookReference)
-        {
-            if (!Equals(ebookReference, default))
-            {
-                EbookActual.Reference = ebookReference;
-                if (cmbChapters.SelectedIndex >= EbookActual.Reference.TotalChapters)
-                {
-                    cmbChapters.SelectionChanged -= cmbChapters_SelectionChanged;
-                    cmbChapters.SelectedIndex = 0;
-                    cmbChapters.SelectionChanged += cmbChapters_SelectionChanged;
-                }
-                ParrafosCapitulosReference = EbookActual.Reference.Version.GetContentElementsArray(cmbChapters.SelectedIndex);
-                cmbParrafosReference.Items.Clear();
-                cmbParrafosReference.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosReference.Length).ToArray().Convert((p) => $"párrafo referencia {p}"));
-                cmbParrafosReference.SelectedIndex = 0;
-                cmbParrafosReference_SelectionChanged();
-
-                cmbParrafosVersion.SelectedIndex = 0;
-
-                cmbParrafosVersion_SelectionChanged();
-                Title = $"Editando {EbookActual}";
+                if (!DicStandard.ContainsKey(ebook.RelativeEbookPath))
+                    DicStandard.Add(ebook.RelativeEbookPath, new EbookStandaritzed(ebook));
+               ebookStandaritzed= DicStandard[ebook.RelativeEbookPath];
 
             }
-        }
-
-        private int? GetIfIsNumberValid(TextBox textBox)
-        {
-            int aux;
-            int? result;
-            if (int.TryParse(textBox.Text.Trim(' ','\t','\n','\r'), out aux))
-            {
-                result = aux;
-            }
-            else
-            {
-                result = default;
-            }
-            return result;
-        }
-        private void txtPos_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            int? number = GetIfIsNumberValid(sender as TextBox);
-            if (number.HasValue)
-            {
-                ParrafoActual.Posicion = number.Value;
-                EbookActual.Save();
-               
-            }
-        }
-
-     
-
-        private void txtFin_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            int? number = GetIfIsNumberValid(sender as TextBox);
-            if (number.HasValue)
-            {
-                ParrafoActual.CharFin = number.Value;
-                EbookActual.Save();
-            }
-        }
-
-        private void txtInicio_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            int? number = GetIfIsNumberValid(sender as TextBox);
-            if (number.HasValue)
-            {
-                ParrafoActual.CharInicio = number.Value;
-                EbookActual.Save();
-            }
-        }
-
-        private void txtIndexFin_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            int? number = GetIfIsNumberValid(sender as TextBox);
-            if (number.HasValue)
-            {
-                ParrafoActual.IndexFin = number.Value;
-                EbookActual.Save();
-            }
-        }
-
-        private void txtIndexInicio_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            int? number = GetIfIsNumberValid(sender as TextBox);
-            if (number.HasValue)
-            {
-                ParrafoActual.IndexInicio = number.Value;
-                EbookActual.Save();
-            }
-        }
-
-        private void chkbSaltarParrafo_Checked(object sender, RoutedEventArgs e)
-        {
-            ParrafoActual.Saltar = true;
-            EbookActual.Save();
-        }
-
-        private void chkbSaltarParrafo_Unchecked(object sender, RoutedEventArgs e)
-        {
-            ParrafoActual.Saltar = false;
-            EbookActual.Save();
+            return ebookStandaritzed;
         }
     }
 }
