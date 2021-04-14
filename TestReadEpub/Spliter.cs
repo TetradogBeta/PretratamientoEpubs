@@ -7,11 +7,12 @@ using Gabriel.Cat.S.Extension;
 
 namespace CommonEbookPretractament
 {
-    public class Spliter : IElementoBinarioComplejo,ISaveAndLoad,IComparable,IComparable<Spliter>
+    public class Spliter : IElementoBinarioComplejo,IComparable,IComparable<Spliter>
     {
         const int DEFAULT = -1;
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<Spliter>();
         static readonly byte[] Empty = Serializador.GetBytes(new Spliter());
+        static readonly byte[] Invalid = Serializador.GetBytes(new Spliter() { Saltar = true });
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
 
         public int IndexInicio { get; set; } = DEFAULT;
@@ -29,65 +30,58 @@ namespace CommonEbookPretractament
 
         public bool AcabaEnElMismoIndex => IndexFin == DEFAULT || IndexInicio == IndexFin;
 
-        public bool IsRelevant =>! GetBytes().AreEquals(Empty);
+        public bool IsRelevant =>IsValid && !GetBytes().AreEquals(Empty);
+        public bool IsValid => !GetBytes().AreEquals(Invalid);
         public byte[] GetBytes() => Serializador.GetBytes(this);
 
-        void ISaveAndLoad.Save()
-        {
-            if (IndexInicio == IndexFin)
-                IndexFin = DEFAULT;
-            if (CharInicio == 0)
-                CharInicio = DEFAULT;
 
-        }
-
-        void ISaveAndLoad.Load()
-        {
-            if (IndexFin == DEFAULT)
-                IndexFin = IndexInicio;
-            if (CharInicio == DEFAULT)
-                CharInicio = 0;
-        }
 
         int IComparable.CompareTo(object obj)
         {
-            return IComparteTo(obj as Spliter);
+            return ICompareTo(obj as Spliter);
         }
 
         int IComparable<Spliter>.CompareTo(Spliter other)
         {
-            return IComparteTo(other);
+            return ICompareTo(other);
         }
-        int IComparteTo(Spliter other)
+        int ICompareTo(Spliter other)
         {//se tiene que ajustar
-            int compareTo = !Equals(other, default) ? 0 : 1;
+            int compareTo = !Equals(other,default)?0:1;
             if (compareTo == 0)
             {
-                compareTo= Saltar ? other.Saltar ? IndexInicio.CompareTo(other.IndexInicio) : 1 : -1;
-
+                compareTo = Saltar.CompareTo(other.Saltar)*-1;
                 if (compareTo == 0)
                 {
-                    if (CharInicio == -1)
-                        compareTo = -1;
-                    else if (other.CharInicio == -1)
-                        compareTo = 1;
-                    else
-                        compareTo = CharInicio.CompareTo(other.CharInicio);
+                    compareTo = IndexInicio.CompareTo(other.IndexInicio);
                     if (compareTo == 0)
                     {
-                        if (CharFin == -1)
-                            compareTo = 1;
-                        else if (other.CharFin == -1)
-                            compareTo = -1;
-                        else
-                            compareTo = CharFin.CompareTo(other.CharFin);
-
-
+                        compareTo = IndexFin.CompareTo(other.IndexFin);
+                        if (compareTo == 0)
+                        {
+                            compareTo = CharInicio.CompareTo(other.CharInicio);
+                            if (compareTo == 0)
+                            {
+                                compareTo = CharFin.CompareTo(other.CharFin);
+                            }
+                        }
                     }
                 }
+               
             }
-            
-            return compareTo*-1;//asi los ordeno de mas pequeño a mayor
+            return compareTo;//asi los ordeno de mas pequeño a mayor
+        }
+        public override bool Equals(object obj)
+        {
+            return ICompareTo(obj as Spliter) == 0;
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+        public override string ToString()
+        {
+            return $"{(Saltar ? "#" : string.Empty)} PI:{IndexInicio},PF:{IndexFin},CI:{CharInicio},CF:{CharFin}";
         }
 
         public static IEnumerable<string> GetParts(List<Spliter> parts, IEnumerable<string> textosATratar, string strJoin = "")
@@ -103,12 +97,12 @@ namespace CommonEbookPretractament
             StringBuilder strActual = new StringBuilder();
             int posActual = 0;
 
-           // parts.Sort();//me da problemas al momento de ordenarlo...
+           parts.Sort();//mirar si ordena bien
             //los parrafos que son identicos antes de encontrar uno editado
             for (int i = 0; i < parts[0].IndexInicio; i++)
                 yield return strsVer[posActual++];
             //mix parrafos saltados,splited,joined,enteros
-            for (int i = 0; i < parts.Count; i++)
+            for (int i = 0; i < parts.Count && posActual < strsVer.Count; i++)
             {
                 if (parts[i].IsRelevant)
                 {

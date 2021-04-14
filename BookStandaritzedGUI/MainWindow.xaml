@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BookStandaritzedGUI"
         mc:Ignorable="d"
-        Title="Book Standaritzed V1.0" Height="450" Width="800">
+        Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition MaxWidth="250"/>

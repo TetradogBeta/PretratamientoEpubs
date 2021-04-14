@@ -35,6 +35,27 @@ namespace BookStandaritzedGUI
         public void Refresh()
         {
             parrafosCapitulo.Children.Clear();
+            Parrafos.ForEach((p) =>
+            {
+                TextBlock tbParrafo = new TextBlock();
+                tbParrafo.Height = 15;
+                tbParrafo.Text = p.ToString();
+                if (p.Saltar)
+                    tbParrafo.Foreground = Brushes.DarkGray;
+                tbParrafo.Tag = p;
+                tbParrafo.MouseLeftButtonDown += (s, e) => {
+
+                    if (!Equals(SpliterSelected, default))
+                    {
+                        SpliterSelected(this, new SpliterEventArgs((s as TextBlock).Tag as Spliter));
+                    }
+                    foreach (UIElement item in parrafosCapitulo.Children)
+                        (item as TextBlock).Background = Brushes.White;
+                    (s as TextBlock).Background = Brushes.LightBlue;
+                
+                };
+                parrafosCapitulo.Children.Add(tbParrafo);
+            });
             //añado los capitulos
             //onClick SpliterSelected
         }

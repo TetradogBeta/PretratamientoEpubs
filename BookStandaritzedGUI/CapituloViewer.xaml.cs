@@ -27,8 +27,8 @@ namespace BookStandaritzedGUI
         {
             InitializeComponent();
         
-            EbookActual = new EbookStandaritzed();
-            ParrafoActual = new Spliter();
+            //EbookActual = new EbookStandaritzed();
+            //ParrafoActual = new Spliter();
             ParrafosCapitulosReference = new string[] { string.Empty };
             ParrafosCapitulosVersion = new string[] { string.Empty };
 
@@ -52,10 +52,14 @@ namespace BookStandaritzedGUI
 
                 chkbSaltarParrafo.IsChecked = parrafoActual.Saltar;
 
-                if(!visorCapitiloSpliter.Parrafos.Contains(parrafoActual))
+                if(!visorCapitiloSpliter.Parrafos.Exists((p)=>p.CompareTo(parrafoActual)==0))
                 {
                     visorCapitiloSpliter.Parrafos.Add(parrafoActual);
                     visorCapitiloSpliter.Refresh();
+                }
+                else
+                {
+                  parrafoActual= visorCapitiloSpliter.Parrafos.First((p) => p.CompareTo(parrafoActual) == 0);
                 }
 
             }
@@ -196,7 +200,7 @@ namespace BookStandaritzedGUI
             if (cmbChapters.SelectedIndex != -1)
             {
                 ParrafosCapitulosVersion = EbookActual.Version.GetContentElementsArray(cmbChapters.SelectedIndex);
-                ParrafosCapitulosReference = EbookActual.Reference.Version.GetContentElementsArray(cmbChapters.SelectedIndex);
+                ParrafosCapitulosReference = EbookActual.Reference.GetContentElementsArray(cmbChapters.SelectedIndex);
                 cmbParrafosReference.Items.Clear();
                 cmbParrafosReference.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosReference.Length).ToArray().Convert((p) => $"párrafo referencia {p}"));
 
@@ -214,12 +218,16 @@ namespace BookStandaritzedGUI
 
         private void cmbEbookOriginal_SelectionChanged(object sender=null, SelectionChangedEventArgs e=null)
         {
-            EbookActual.Reference = MainWindow.GetReference(cmbEbookOriginal.SelectedItem as EbookSplited);
-           
-            cmbChapters.SelectionChanged -= cmbChapters_SelectionChanged;
-            cmbChapters.SelectedIndex = 0;
-            cmbChapters.SelectionChanged += cmbChapters_SelectionChanged;
-            cmbChapters_SelectionChanged();
+            if (cmbEbookOriginal.SelectedIndex >= 0)
+            {
+                EbookActual.Reference = MainWindow.GetReference(cmbEbookOriginal.SelectedItem as EbookSplited);
+                CheckAndSave();
+            }
+                cmbChapters.SelectionChanged -= cmbChapters_SelectionChanged;
+                cmbChapters.SelectedIndex = 0;
+                cmbChapters.SelectionChanged += cmbChapters_SelectionChanged;
+                cmbChapters_SelectionChanged();
+          
 
 
         }
@@ -247,13 +255,14 @@ namespace BookStandaritzedGUI
                 visorCapitiloSpliter.Parrafos.Remove(ParrafoActual);
                 visorCapitiloSpliter.Refresh();
                 ParrafoActual = new Spliter();
+                CheckAndSave();
             }
         }
 
         private void rtbVersion_SelectionChanged(object sender, RoutedEventArgs e)
         {
             Point ptrSelection = rtbVersion.GetSelectionRange();
-            tbInfo.Text = $": P {cmbParrafosVersion.SelectedIndex}, Inicio = {ptrSelection.X}, Fin = {ptrSelection.Y}";
+            tbInfo.Text = $": Index Inicio = {cmbParrafosVersion.SelectedIndex}, Inicio = {ptrSelection.X}, Fin = {ptrSelection.Y}";
         }
     }
 }

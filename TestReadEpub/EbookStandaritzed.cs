@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Gabriel.Cat.S.Binaris;
 using Gabriel.Cat.S.Extension;
 
@@ -48,13 +50,20 @@ namespace CommonEbookPretractament
         public int TotalChapters => Version.TotalChapters;
         public string SavePath => System.IO.Path.Combine(EbookStandaritzed.Directory, $"{Version.OriginalTitle} [{Version.Idioma}].ebookStandaritzed");
 
+        [IgnoreSerialitzer]
+        bool RemoveDummy { get; set; } = true;
+
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
         void ISaveAndLoad.Save()
         {
             if (!Equals(Reference, default))
             {
-                if(!Equals(Reference.Version.EbookPath, Version.EbookPath))
+                if (!Equals(Reference.Version.EbookPath, Version.EbookPath))
+                {
+                    if (!File.Exists(Reference.SavePath))
+                        Reference.Save();
                     ReferencePath = System.IO.Path.GetRelativePath(EbookSplited.Directory, Reference.SavePath);
+                }
             }
             else
             {
@@ -62,7 +71,7 @@ namespace CommonEbookPretractament
             }
             VersionPath   =System.IO.Path.GetRelativePath(EbookSplited.Directory,  Version.SavePath);
 
-            for (int i = 0; i < CapitulosEditados.Length; i++)
+            for (int i = 0; i < CapitulosEditados.Length && RemoveDummy; i++)
                 if (!Equals(CapitulosEditados[i],default) && !CapitulosEditados[i].IsRelevant)
                     CapitulosEditados[i] = default;
         }
@@ -83,8 +92,9 @@ namespace CommonEbookPretractament
         }
         public byte[] GetBytes() => Serializador.GetBytes(this);
 
-        public void Save()
+        public void Save(bool removeDummy=false)
         {
+            RemoveDummy = removeDummy;
             GetBytes().Save(SavePath);
         }
         public Capitulo GetCapitulo(int pos)
@@ -96,6 +106,12 @@ namespace CommonEbookPretractament
                 CapitulosEditados[pos] = new Capitulo();
             return CapitulosEditados[pos];
         }
+        public IEnumerable<string> GetContentElements(int chapter)
+        {
+            return GetCapitulo(chapter).GetParrafos(Version, chapter);
+        }
+        public string[] GetContentElementsArray(int chapter) => GetContentElements(chapter).ToArray();
+
         public bool Finished()
         {
             bool finished = Reference.TotalChapters == Version.TotalChapters;
@@ -118,6 +134,8 @@ namespace CommonEbookPretractament
             return files.Convert((f) => GetEbookStandaritzed(f.GetBytes()));
 
         }
+
+      
     }
 
 }

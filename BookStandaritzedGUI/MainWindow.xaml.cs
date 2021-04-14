@@ -23,6 +23,7 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static string Version = "Book Standaritzed V1.0";
         public static SortedList<string,EbookStandaritzed> DicStandard { get; set; }
         public static SortedList<string, EbookSplited> DicSplited { get; set; }
         public static GroupItem Group { get; set; }
@@ -32,6 +33,7 @@ namespace BookStandaritzedGUI
 
         public  MainWindow()
         {
+            Title = Version;
             DicStandard = new SortedList<string, EbookStandaritzed>();
             DicSplited = new SortedList<string, EbookSplited>();
 
@@ -58,7 +60,7 @@ namespace BookStandaritzedGUI
             }
             DicStandard.Clear();
             for (int i = 0; i < ebooksStandaritzed.Length; i++)
-                DicStandard.Add(ebooksStandaritzed[i].VersionPath, ebooksStandaritzed[i]);
+                DicStandard.Add(ebooksStandaritzed[i].Version.SaveName, ebooksStandaritzed[i]);
 
             Group = default;
             foreach (var title in dic)
@@ -90,6 +92,7 @@ namespace BookStandaritzedGUI
             {
 
                 capituloViewer.EbookActual = ebookStandaritzed;
+                Title = $"{Version} #Trabajando# {ebook.SaveName}";
 
             }
         }
@@ -99,9 +102,9 @@ namespace BookStandaritzedGUI
             EbookStandaritzed ebookStandaritzed = default;
             if (!Equals(ebook, default))
             {
-                if (!DicStandard.ContainsKey(ebook.RelativeEbookPath))
-                    DicStandard.Add(ebook.RelativeEbookPath, new EbookStandaritzed(ebook));
-               ebookStandaritzed= DicStandard[ebook.RelativeEbookPath];
+                if (!DicStandard.ContainsKey(ebook.SaveName))
+                    DicStandard.Add(ebook.SaveName, new EbookStandaritzed(ebook));
+               ebookStandaritzed= DicStandard[ebook.SaveName];
 
             }
             return ebookStandaritzed;

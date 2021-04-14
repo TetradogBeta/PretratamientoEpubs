@@ -35,7 +35,7 @@ namespace BookStandaritzedGUI
             stkReference.Children.AddRange(txtReference.ToArray().Convert(StringToView));
         }
 
-        public ProgressViewer(EbookStandaritzed ebook, int chapter):this(ebook.GetCapitulo(chapter).GetParrafos(ebook.Version, chapter), ebook.Reference.Version.GetContentElements(chapter))
+        public ProgressViewer(EbookStandaritzed ebook, int chapter):this(ebook.GetContentElements(chapter), ebook.Reference.GetContentElements(chapter))
         {
     
         }

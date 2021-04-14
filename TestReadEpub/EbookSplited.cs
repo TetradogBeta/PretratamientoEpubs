@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Gabriel.Cat.S.Binaris;
@@ -6,7 +7,7 @@ using Gabriel.Cat.S.Extension;
 
 namespace CommonEbookPretractament
 {
-    public class EbookSplited:ISaveAndLoad,IElementoBinarioComplejo
+    public class EbookSplited:ISaveAndLoad,IElementoBinarioComplejo,IComparable<EbookSplited>,IComparable
     {
         
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<EbookSplited>();
@@ -40,7 +41,9 @@ namespace CommonEbookPretractament
 
         public bool[] CapitulosAOmitir { get; set; }
 
-        public string SavePath => System.IO.Path.Combine(Directory, $"{OriginalTitle}  [{ Idioma}].ebookSplited");
+        public string SaveName => $"{OriginalTitle}  [{ Idioma}]";
+
+        public string SavePath => System.IO.Path.Combine(Directory, $"{SaveName}.ebookSplited");
 
 
         [IgnoreSerialitzer]
@@ -109,7 +112,32 @@ namespace CommonEbookPretractament
         {
             return $"[{Idioma}] {OriginalTitle}";
         }
+        int IComparable<EbookSplited>.CompareTo(EbookSplited other)
+        {
+            return ICompareTo(other);
+        }
 
+        int IComparable.CompareTo(object obj)
+        {
+            return ICompareTo(obj as EbookSplited);
+        }
+        int ICompareTo(EbookSplited other)
+        {
+            int compareTo = !Equals(other, default) ? 0 : -1;
+            if (compareTo == 0)
+            {
+                compareTo = SaveName.CompareTo(other.SaveName);
+            }
+            return compareTo;
+        }
+        public override bool Equals(object obj)
+        {
+            return ICompareTo(obj as EbookSplited) == 0;
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
         public static EbookSplited GetEbookSplited(byte[] bytesFile) => (EbookSplited)Serializador.GetObject(bytesFile);
         public static EbookSplited[] GetEbookSplitedNewer(string folder)
         {
@@ -121,5 +149,7 @@ namespace CommonEbookPretractament
             FileInfo[] files = new DirectoryInfo(EbookSplited.Directory).GetFiles();
             return files.Convert((e) => GetEbookSplited(e.GetBytes()));
         }
+
+
     }
 }
