@@ -48,7 +48,7 @@ namespace CommonEbookPretractament
         public string VersionPath { get; set; }
         public Capitulo[] CapitulosEditados { get; set; }
         public int TotalChapters => Version.TotalChapters;
-        public string SavePath => System.IO.Path.Combine(EbookStandaritzed.Directory, $"{Version.OriginalTitle} [{Version.Idioma}].ebookStandaritzed");
+        public string SavePath => System.IO.Path.Combine(EbookStandaritzed.Directory, $"{Version.SaveName}.ebookStandaritzed");
 
         [IgnoreSerialitzer]
         bool RemoveDummy { get; set; } = true;
@@ -56,13 +56,17 @@ namespace CommonEbookPretractament
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
         void ISaveAndLoad.Save()
         {
-            if (!Equals(Reference, default))
+            if (!Equals(Reference, default) && IsParentValid(Reference))
             {
                 if (!Equals(Reference.Version.EbookPath, Version.EbookPath))
                 {
                     if (!File.Exists(Reference.SavePath))
                         Reference.Save();
                     ReferencePath = System.IO.Path.GetRelativePath(EbookSplited.Directory, Reference.SavePath);
+                }
+                else
+                {
+                    ReferencePath = default;
                 }
             }
             else
@@ -76,13 +80,36 @@ namespace CommonEbookPretractament
                     CapitulosEditados[i] = default;
         }
 
+        public bool IsParentValid(EbookStandaritzed parent)
+        {
+            bool hasParent=false;
+            //si el parent tiene referencia a este ebook no es valido
+            while (!hasParent && !Equals(parent.Reference, default) && !Equals(parent, parent.Reference)) 
+            {
+
+                hasParent = Equals(SavePath, parent.Reference.SavePath);
+                if (!hasParent)
+                    parent = parent.Reference;
+
+            } 
+
+
+
+            return !hasParent;
+        }
+
         void ISaveAndLoad.Load()
         {
+            string path;
 
             Version   = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookSplited.Directory, VersionPath)));
             if (!Equals(ReferencePath, default))
             {
-                Reference = EbookStandaritzed.GetEbookStandaritzed(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookStandaritzed.Directory, ReferencePath)));
+
+                path = System.IO.Path.Combine(EbookStandaritzed.Directory, ReferencePath);
+                if(File.Exists(path))
+                  Reference = EbookStandaritzed.GetEbookStandaritzed(System.IO.File.ReadAllBytes(path));
+                else Reference = new EbookStandaritzed() { Version = this.Version };
             }
             else
             {
@@ -108,7 +135,7 @@ namespace CommonEbookPretractament
         }
         public IEnumerable<string> GetContentElements(int chapter)
         {
-            return GetCapitulo(chapter).GetParrafos(Version, chapter);
+            return chapter<CapitulosEditados.Length? GetCapitulo(chapter).GetParrafos(Version, chapter):new string[0];
         }
         public string[] GetContentElementsArray(int chapter) => GetContentElements(chapter).ToArray();
 
@@ -118,11 +145,12 @@ namespace CommonEbookPretractament
 
             for(int i=0;i<Reference.TotalChapters && finished; i++)
             {
-                finished = Equals(CapitulosEditados[i],default) || CapitulosEditados[i].Finished(Reference, Version, i);
+                finished = Finished(i);
             }
 
             return finished;
         }
+        public bool Finished(int chapter)=>GetContentElementsArray(chapter).Length == Reference.GetContentElementsArray(chapter).Length;
         public override string ToString()
         {
             return $"Reference {Reference.Version}";

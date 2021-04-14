@@ -23,12 +23,12 @@ namespace BookStandaritzedGUI
     {
         private Spliter parrafoActual;
 
+        public event EventHandler HasChanges;
+
         public CapituloViewer()
         {
             InitializeComponent();
-        
-            //EbookActual = new EbookStandaritzed();
-            //ParrafoActual = new Spliter();
+
             ParrafosCapitulosReference = new string[] { string.Empty };
             ParrafosCapitulosVersion = new string[] { string.Empty };
 
@@ -79,7 +79,7 @@ namespace BookStandaritzedGUI
                     cmbEbookOriginal.SelectedIndex = cmbEbookOriginal.Items.IndexOf(EbookActual.Reference.Version);
                     cmbEbookOriginal.SelectionChanged += cmbEbookOriginal_SelectionChanged;
                     cmbChapters.Items.Clear();
-                    cmbChapters.Items.AddRange(Enumerable.Range(0, EbookActual.TotalChapters).ToArray().Convert((p) => $"Capítulo {p}"));
+                    cmbChapters.Items.AddRange(Enumerable.Range(0, EbookActual.TotalChapters).ToArray().Convert((p) => $"Capítulo {p+1}"));
                     cmbEbookOriginal_SelectionChanged();
                 }
 
@@ -92,6 +92,8 @@ namespace BookStandaritzedGUI
             visorCapitiloSpliter.Refresh();
 
             CheckChapterFinished();
+            if (HasChanges != null)
+                HasChanges(this, new EventArgs());
 
         }
 
@@ -99,7 +101,7 @@ namespace BookStandaritzedGUI
         {
             if (cmbChapters.SelectedIndex >= 0 && cmbChapters.SelectedIndex < EbookActual.TotalChapters)
             {
-                if (EbookActual.GetCapitulo(cmbChapters.SelectedIndex).Finished(EbookActual.Reference, EbookActual.Version, cmbChapters.SelectedIndex))
+                if (EbookActual.Finished(cmbChapters.SelectedIndex))
                 {
                     rtbVersion.Background = Brushes.LightGreen;
                 }
@@ -202,10 +204,10 @@ namespace BookStandaritzedGUI
                 ParrafosCapitulosVersion = EbookActual.Version.GetContentElementsArray(cmbChapters.SelectedIndex);
                 ParrafosCapitulosReference = EbookActual.Reference.GetContentElementsArray(cmbChapters.SelectedIndex);
                 cmbParrafosReference.Items.Clear();
-                cmbParrafosReference.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosReference.Length).ToArray().Convert((p) => $"párrafo referencia {p}"));
+                cmbParrafosReference.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosReference.Length).ToArray().Convert((p) => $"párrafo referencia {p+1}"));
 
                 cmbParrafosVersion.Items.Clear();
-                cmbParrafosVersion.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosVersion.Length).ToArray().Convert((p) => $"párrafo versión {p}"));
+                cmbParrafosVersion.Items.AddRange(Enumerable.Range(0, ParrafosCapitulosVersion.Length).ToArray().Convert((p) => $"párrafo versión {p+1}"));
 
                 cmbParrafosReference.SelectedIndex = 0;
                 cmbParrafosVersion.SelectedIndex = 0;
@@ -218,9 +220,26 @@ namespace BookStandaritzedGUI
 
         private void cmbEbookOriginal_SelectionChanged(object sender=null, SelectionChangedEventArgs e=null)
         {
+            EbookStandaritzed parent;
             if (cmbEbookOriginal.SelectedIndex >= 0)
             {
-                EbookActual.Reference = MainWindow.GetReference(cmbEbookOriginal.SelectedItem as EbookSplited);
+                parent= MainWindow.GetReference(cmbEbookOriginal.SelectedItem as EbookSplited);
+                if (EbookActual.IsParentValid(parent))
+                    EbookActual.Reference = parent;
+                else
+                {
+                    cmbEbookOriginal.SelectionChanged -= cmbEbookOriginal_SelectionChanged;
+                    if (!Equals(EbookActual.Reference, default))
+                    {
+                        cmbEbookOriginal.SelectedIndex = cmbEbookOriginal.Items.IndexOf(cmbEbookOriginal.Items.ToArray().First((l) => l.Equals(EbookActual.Reference.Version)));
+                    }
+                    else
+                    {
+                        cmbEbookOriginal.SelectedIndex = -1;
+                    }
+                    cmbEbookOriginal.SelectionChanged += cmbEbookOriginal_SelectionChanged;
+                }
+                
                 CheckAndSave();
             }
                 cmbChapters.SelectionChanged -= cmbChapters_SelectionChanged;

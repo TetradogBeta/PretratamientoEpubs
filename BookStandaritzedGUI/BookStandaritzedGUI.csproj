@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BooksSplitedGUI\BooksSplitedGUI.csproj" />
     <ProjectReference Include="..\TestReadEpub\TestReadEpub.csproj" />
   </ItemGroup>
 

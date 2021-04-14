@@ -12,6 +12,6 @@
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
         <ListView x:Name="lstEbookSplited"/>
-        <local:CapituloViewer x:Name="capituloViewer" Grid.Column="1"/>
+        <local:CapituloViewer x:Name="capituloViewer" Grid.Column="1" HasChanges="capituloViewer_HasChanges"/>
     </Grid>
 </Window>

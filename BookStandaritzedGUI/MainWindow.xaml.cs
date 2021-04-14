@@ -23,7 +23,7 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string Version = "Book Standaritzed V1.0";
+        public static string Version = "Book Standaritzed V1.2";
         public static SortedList<string,EbookStandaritzed> DicStandard { get; set; }
         public static SortedList<string, EbookSplited> DicSplited { get; set; }
         public static GroupItem Group { get; set; }
@@ -60,7 +60,8 @@ namespace BookStandaritzedGUI
             }
             DicStandard.Clear();
             for (int i = 0; i < ebooksStandaritzed.Length; i++)
-                DicStandard.Add(ebooksStandaritzed[i].Version.SaveName, ebooksStandaritzed[i]);
+                if(!DicStandard.ContainsKey(ebooksStandaritzed[i].Version.SaveName))
+                   DicStandard.Add(ebooksStandaritzed[i].Version.SaveName, ebooksStandaritzed[i]);
 
             Group = default;
             foreach (var title in dic)
@@ -92,8 +93,20 @@ namespace BookStandaritzedGUI
             {
 
                 capituloViewer.EbookActual = ebookStandaritzed;
-                Title = $"{Version} #Trabajando# {ebook.SaveName}";
+                UpdateTitle();
 
+            }
+        }
+
+        private void UpdateTitle()
+        {
+            if (!capituloViewer.EbookActual.Finished())
+            {
+                Title = $"{Version} #Trabajando# {capituloViewer.EbookActual.Version.SaveName}";
+            }
+            else
+            {
+                Title = $"{Version} #Finiquitado# {capituloViewer.EbookActual.Version.SaveName}";
             }
         }
 
@@ -108,6 +121,11 @@ namespace BookStandaritzedGUI
 
             }
             return ebookStandaritzed;
+        }
+
+        private void capituloViewer_HasChanges(object sender, EventArgs e)
+        {
+            UpdateTitle();
         }
     }
 }

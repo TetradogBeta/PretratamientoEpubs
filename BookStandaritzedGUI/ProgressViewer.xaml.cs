@@ -37,7 +37,7 @@ namespace BookStandaritzedGUI
 
         public ProgressViewer(EbookStandaritzed ebook, int chapter):this(ebook.GetContentElements(chapter), ebook.Reference.GetContentElements(chapter))
         {
-    
+            Title = $"Resultado       {ebook.Version.SaveName}      ~       {ebook.Reference.Version.SaveName}";
         }
 
         UIElement StringToView(string str)
