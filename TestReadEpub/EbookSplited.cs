@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Gabriel.Cat.S.Binaris;
 using Gabriel.Cat.S.Extension;
+using Notifications.Wpf.Core;
 
 namespace CommonEbookPretractament
 {
@@ -13,12 +15,18 @@ namespace CommonEbookPretractament
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<EbookSplited>();
 
         [IgnoreSerialitzer]
-        public static string Directory { get; set; } 
+        public static string Directory { get; set; }
+        [IgnoreSerialitzer]
+        public static string DirectoryInCompatible { get; set; }
         static EbookSplited()
         {
             Directory = new DirectoryInfo("EbookSpliteds").FullName;
             if (!System.IO.Directory.Exists(Directory))
                 System.IO.Directory.CreateDirectory(Directory);
+
+            DirectoryInCompatible = new DirectoryInfo("Ebooks Incompatibles").FullName;
+            if (!System.IO.Directory.Exists(DirectoryInCompatible))
+                System.IO.Directory.CreateDirectory(DirectoryInCompatible);
         }
 
         int totalChapters;
@@ -54,6 +62,8 @@ namespace CommonEbookPretractament
         #region Serializar
 
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
+
+        public bool IsRelevant => CapitulosAOmitir.Any((s) => s);
 
         void ISaveAndLoad.Load()
         {
@@ -139,15 +149,52 @@ namespace CommonEbookPretractament
             return base.GetHashCode();
         }
         public static EbookSplited GetEbookSplited(byte[] bytesFile) => (EbookSplited)Serializador.GetObject(bytesFile);
-        public static EbookSplited[] GetEbookSplitedNewer(string folder)
+        public static async Task<EbookSplited[]> GetEbookSplitedNewer(string folder)
         {
+            string pathDirEbook;
+            NotificationManager notificationManager;
             FileInfo[] files = new DirectoryInfo(System.IO.Path.Combine(Ebook.Directory,folder)).GetFiles();
-            return files.Convert((e) => new EbookSplited(e));
+            List<EbookSplited> ebooks = new List<EbookSplited>();
+            for(int i=0;i<files.Length;i++)
+                try
+                {
+                    ebooks.Add(new EbookSplited(files[i]));
+                }
+                catch {
+                    pathDirEbook = System.IO.Path.Combine(DirectoryInCompatible, files[i].Directory.Name);
+                    if (!System.IO.Directory.Exists(pathDirEbook))
+                        System.IO.Directory.CreateDirectory(pathDirEbook);
+                    files[i].MoveTo(System.IO.Path.Combine(pathDirEbook, files[i].Name));
+                    //notifico el cambio
+                    notificationManager = new NotificationManager();
+
+                    await notificationManager.ShowAsync(new NotificationContent
+                    {
+                        Title = "Libro Incompatible Encontrado!",
+                        Message = files[i].FullName,
+                        Type = NotificationType.Information
+                    });
+
+                }
+            return ebooks.ToArray();
         }
+
         public static EbookSplited[] GetEbookSpliteds()
         {
-            FileInfo[] files = new DirectoryInfo(EbookSplited.Directory).GetFiles();
-            return files.Convert((e) => GetEbookSplited(e.GetBytes()));
+            FileInfo[] files = new DirectoryInfo(Directory).GetFiles();
+            List<EbookSplited> ebooks = new List<EbookSplited>();
+ 
+            for(int i=0;i<files.Length;i++)
+            {
+                try
+                {
+                    ebooks.Add(GetEbookSplited(files[i].GetBytes()));
+                }
+                catch {
+
+                }
+            }
+            return ebooks.ToArray();
         }
 
 

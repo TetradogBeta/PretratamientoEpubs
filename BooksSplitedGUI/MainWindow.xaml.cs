@@ -50,17 +50,29 @@ namespace BooksSplitedGUI
         private void lstFolders_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             EbookSplited[] newsEbooks;
+            Task<EbookSplited[]> task;
             if (!Equals(lstFolders.SelectedItem, default))
             {
-                lstBooksFolder.Items.Clear();
-                newsEbooks = EbookSplited.GetEbookSplitedNewer((string)lstFolders.SelectedItem);
-                for(int i = 0; i < newsEbooks.Length; i++)
+                txtNameFile.Text = string.Empty;
+          
+                task = EbookSplited.GetEbookSplitedNewer((string)lstFolders.SelectedItem);
+                task.ContinueWith((r) =>
                 {
-                    if (DicBooksSaved.ContainsKey(newsEbooks[i].RelativeEbookPath))
-                        lstBooksFolder.Items.Add(DicBooksSaved[newsEbooks[i].RelativeEbookPath]);
-                    else lstBooksFolder.Items.Add(newsEbooks[i]);
-                }
-                lstBooksFolder.SelectedIndex = 0;
+                    Action act = () =>
+                    {
+                        newsEbooks = task.Result;
+                        lstBooksFolder.Items.Clear();
+                        for (int i = 0; i < newsEbooks.Length; i++)
+                        {
+                            if (DicBooksSaved.ContainsKey(newsEbooks[i].RelativeEbookPath))
+                                lstBooksFolder.Items.Add(DicBooksSaved[newsEbooks[i].RelativeEbookPath]);
+                            else lstBooksFolder.Items.Add(newsEbooks[i]);
+                        }
+                        lstBooksFolder.SelectedIndex = 0;
+                    };
+                    Dispatcher.BeginInvoke(act);
+                });
+
             }
         }
         private void lstBooksFolder_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -90,10 +102,14 @@ namespace BooksSplitedGUI
                 Selected.OriginalTitle = campos[0];
                 Selected.Idioma = campos[1];
                 lstBooksFolder.Items.Refresh();
+                if (Selected.IsRelevant)
+                {
+                    Selected.Save();
+                }
             }
             else
             {
-                MessageBox.Show("Se requiere un títuloOriginal;idioma", "Atención", MessageBoxButton.YesNo,MessageBoxImage.Information);
+                MessageBox.Show("Se requiere un títuloOriginal;idioma", "Atención", MessageBoxButton.OK,MessageBoxImage.Information);
             }
 
         }
