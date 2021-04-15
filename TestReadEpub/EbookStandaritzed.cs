@@ -52,6 +52,7 @@ namespace CommonEbookPretractament
 
         [IgnoreSerialitzer]
         bool RemoveDummy { get; set; } = true;
+        public bool IsABase => Version.Equals(Reference.Version);
 
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
         void ISaveAndLoad.Save()
@@ -141,11 +142,23 @@ namespace CommonEbookPretractament
 
         public bool Finished()
         {
-            bool finished = Reference.TotalChapters == Version.TotalChapters;
 
-            for(int i=0;i<Reference.TotalChapters && finished; i++)
+            int  pos=0;
+            bool continuar= !Equals(Version, Reference.Version);
+
+            bool finished = !continuar;
+            if (continuar)
             {
-                finished = Finished(i);
+                continuar = Reference.TotalChapters == Version.TotalChapters;
+
+                while (pos < Reference.TotalChapters && continuar)
+                {
+                    continuar = Finished(pos);
+                    pos++;
+                } 
+
+                finished = pos == Reference.TotalChapters;
+
             }
 
             return finished;
@@ -153,7 +166,7 @@ namespace CommonEbookPretractament
         public bool Finished(int chapter)=>GetContentElementsArray(chapter).Length == Reference.GetContentElementsArray(chapter).Length;
         public override string ToString()
         {
-            return $"Reference {Reference.Version}";
+            return $"Version {Version} Reference {Reference.Version}";
         }
         public static EbookStandaritzed GetEbookStandaritzed(byte[] data) => (EbookStandaritzed)Serializador.GetObject(data);
         public static EbookStandaritzed[] GetEbookStandaritzeds()

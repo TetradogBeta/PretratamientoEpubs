@@ -23,11 +23,13 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string Version = "Book Standaritzed V1.2";
+        public static string Version = "Book Standaritzed V1.3";
         public static SortedList<string,EbookStandaritzed> DicStandard { get; set; }
         public static SortedList<string, EbookSplited> DicSplited { get; set; }
         public static GroupItem Group { get; set; }
+        public static bool UnsafeMode { get; set; } = false;
 
+        static string UnsafeString => UnsafeMode ? "Unsafe" : "";
 
 
 
@@ -100,13 +102,16 @@ namespace BookStandaritzedGUI
 
         private void UpdateTitle()
         {
+            string principio = $"{UnsafeString} {Version}";
             if (!capituloViewer.EbookActual.Finished())
             {
-                Title = $"{Version} #Trabajando# {capituloViewer.EbookActual.Version.SaveName}";
+                Title = $"{principio} #Trabajando# {capituloViewer.EbookActual.Version.SaveName}";
             }
             else
             {
-                Title = $"{Version} #Finiquitado# {capituloViewer.EbookActual.Version.SaveName}";
+                if(!capituloViewer.EbookActual.IsABase)
+                     Title = $"{principio} #Finiquitado# {capituloViewer.EbookActual.Version.SaveName}";
+                else Title = $"{principio} #Base# {capituloViewer.EbookActual.Version.SaveName}";
             }
         }
 
@@ -127,5 +132,15 @@ namespace BookStandaritzedGUI
         {
             UpdateTitle();
         }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key.Equals(Key.F12))
+            {
+                UnsafeMode = !UnsafeMode;
+                UpdateTitle();
+            }
+        }
     }
+
 }
