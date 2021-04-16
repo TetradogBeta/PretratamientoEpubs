@@ -13,7 +13,9 @@ namespace CommonEbookPretractament
     {
         
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<EbookSplited>();
+        const string INDEFINIDO = "NO DEFINIDO";
 
+        static List<Task> ToDo = new List<Task>();
         [IgnoreSerialitzer]
         public static string Directory { get; set; }
         [IgnoreSerialitzer]
@@ -37,7 +39,7 @@ namespace CommonEbookPretractament
             Ebook = new Ebook(EbookPath);
             OriginalTitle = Ebook.Epub.Title;
             CapitulosAOmitir = new bool[Ebook.TotalChapters];
-            Idioma = "NO DEFINIDO";
+            Idioma = INDEFINIDO;
             UpdateTotalChapters();
         }
         public EbookSplited(FileInfo epubFile) : this(System.IO.Path.GetRelativePath(Ebook.Directory, epubFile.FullName)) { }
@@ -64,6 +66,8 @@ namespace CommonEbookPretractament
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
 
         public bool IsRelevant => CapitulosAOmitir.Any((s) => s);
+
+        public bool IsOkey => !Equals(OriginalTitle, default) && !Equals(Idioma, INDEFINIDO);
 
         void ISaveAndLoad.Load()
         {
@@ -168,12 +172,12 @@ namespace CommonEbookPretractament
                     //notifico el cambio
                     notificationManager = new NotificationManager();
 
-                    await notificationManager.ShowAsync(new NotificationContent
+                    ToDo.Add(notificationManager.ShowAsync(new NotificationContent
                     {
                         Title = "Libro Incompatible Encontrado!",
                         Message = files[i].FullName,
                         Type = NotificationType.Information
-                    });
+                    }));
 
                 }
             return ebooks.ToArray();

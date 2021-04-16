@@ -166,7 +166,16 @@ namespace CommonEbookPretractament
         public bool Finished(int chapter)=>GetContentElementsArray(chapter).Length == Reference.GetContentElementsArray(chapter).Length;
         public override string ToString()
         {
-            return $"Version {Version} Reference {Reference.Version}";
+            string refName = Reference != null ? Reference.Version.ToString() : "NULL";
+            return $"Version {Version} Reference {refName}";
+        }
+        public override bool Equals(object obj)
+        {
+            EbookStandaritzed other = obj as EbookStandaritzed;
+            bool equals = !Equals(other, default);
+            if (equals)
+                equals = Version.Equals(other.Version);
+            return equals;
         }
         public static EbookStandaritzed GetEbookStandaritzed(byte[] data) => (EbookStandaritzed)Serializador.GetObject(data);
         public static EbookStandaritzed[] GetEbookStandaritzeds()

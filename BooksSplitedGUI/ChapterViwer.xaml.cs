@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using CommonEbookPretractament;
 using Gabriel.Cat.S.Extension;
 using System.Linq;
+using Notifications.Wpf.Core;
 
 namespace BooksSplitedGUI
 {
@@ -22,7 +23,7 @@ namespace BooksSplitedGUI
     /// </summary>
     public partial class ChapterViwer : UserControl
     {
-
+        static List<System.Threading.Tasks.Task> ToDo = new List<System.Threading.Tasks.Task>();
         public ChapterViwer()
         {
             InitializeComponent();
@@ -55,12 +56,28 @@ namespace BooksSplitedGUI
         }
         private void txtContent_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            EbookSplited.CapitulosAOmitir[Chapter] = !EbookSplited.CapitulosAOmitir[Chapter];
-            Update();
-            EbookSplited.Save();
-            if (!MainWindow.DicBooksSaved.ContainsKey(EbookSplited.RelativeEbookPath))
+            NotificationManager notificationManager;
+
+            if (EbookSplited.IsOkey)
             {
-                MainWindow.DicBooksSaved.Add(EbookSplited.RelativeEbookPath, EbookSplited);
+                EbookSplited.CapitulosAOmitir[Chapter] = !EbookSplited.CapitulosAOmitir[Chapter];
+                Update();
+                EbookSplited.Save();
+                if (!MainWindow.DicBooksSaved.ContainsKey(EbookSplited.RelativeEbookPath))
+                {
+                    MainWindow.DicBooksSaved.Add(EbookSplited.RelativeEbookPath, EbookSplited);
+                }
+            }
+            else
+            {
+                notificationManager = new NotificationManager();
+
+                ToDo.Add(notificationManager.ShowAsync(new NotificationContent
+                {
+                    Title = "Atención!",
+                    Message = "Debe poner  tituloOriginal;idioma y darle a SetName",
+                    Type = NotificationType.Error
+                }));
             }
         }
         public static ChapterViwer[] GetChapters(EbookSplited ebookSplited)

@@ -1,5 +1,6 @@
 ﻿using CommonEbookPretractament;
 using Gabriel.Cat.S.Extension;
+using Notifications.Wpf.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +47,8 @@ namespace BookStandaritzedGUI
                 return $"Referencia {Ebook.SaveName}";
             }
         }
+
+        static List<System.Threading.Tasks.Task> ToDo = new List<System.Threading.Tasks.Task>();
 
         private Spliter parrafoActual;
 
@@ -248,7 +251,9 @@ namespace BookStandaritzedGUI
 
         private void cmbEbookOriginal_SelectionChanged(object sender = null, SelectionChangedEventArgs e = null)
         {
+            NotificationManager notificationManager;
             EbookStandaritzed parent;
+            string tituloError;
             if (cmbEbookOriginal.SelectedIndex >= 0)
             {
                 parent = MainWindow.GetReference((cmbEbookOriginal.SelectedItem as DummyEbookSpliter).Ebook);
@@ -259,13 +264,24 @@ namespace BookStandaritzedGUI
                     cmbEbookOriginal.SelectionChanged -= cmbEbookOriginal_SelectionChanged;
                     if (!Equals(EbookActual.Reference, default))
                     {
+                        tituloError = "Pongo el que habia";
                         cmbEbookOriginal.SelectedIndex = GetIndexEbookOriginal(EbookActual.Reference.Version);
                     }
                     else
                     {
+                        tituloError = "No pongo ninguno,elige uno valido";
                         cmbEbookOriginal.SelectedIndex = -1;
                     }
                     cmbEbookOriginal.SelectionChanged += cmbEbookOriginal_SelectionChanged;
+                    notificationManager = new NotificationManager();
+
+                    ToDo.Add(notificationManager.ShowAsync(new NotificationContent
+                    {
+                        Title = tituloError,
+                        Message = "Atención! Has intentado poner como base un descendiente de este mismo...",
+                       
+                        Type = NotificationType.Error
+                    }));
                 }
 
                 CheckAndSave();

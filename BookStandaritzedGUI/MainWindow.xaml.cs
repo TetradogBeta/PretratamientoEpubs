@@ -23,9 +23,8 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string Version = "Book Standaritzed V1.3b";
+        public static string Version = "Book Standaritzed V1.3c";
         public static SortedList<string,EbookStandaritzed> DicStandard { get; set; }
-        public static SortedList<string, EbookSplited> DicSplited { get; set; }
         public static GroupItem Group { get; set; }
         public static bool UnsafeMode { get; set; } = false;
 
@@ -37,8 +36,6 @@ namespace BookStandaritzedGUI
         {
             Title = Version;
             DicStandard = new SortedList<string, EbookStandaritzed>();
-            DicSplited = new SortedList<string, EbookSplited>();
-
             InitializeComponent();
 
             Load();
@@ -52,10 +49,10 @@ namespace BookStandaritzedGUI
          
 
             lstEbookSplited.Items.Clear();
-            DicSplited.Clear();
+
             for (int i = 0; i < ebooksSpited.Length; i++)
             {
-                DicSplited.Add(ebooksSpited[i].EbookPath, ebooksSpited[i]);
+
                 if (!dic.ContainsKey(ebooksSpited[i].OriginalTitle))
                     dic.Add(ebooksSpited[i].OriginalTitle, new List<EbookSplited>());
                 dic[ebooksSpited[i].OriginalTitle].Add(ebooksSpited[i]);
