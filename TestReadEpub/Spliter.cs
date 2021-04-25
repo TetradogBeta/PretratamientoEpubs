@@ -14,12 +14,13 @@ namespace CommonEbookPretractament
         static readonly byte[] Empty = Serializador.GetBytes(new Spliter());
         static readonly byte[] Invalid = Serializador.GetBytes(new Spliter() { Saltar = true });
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
-
-        public int IndexInicio { get; set; } = DEFAULT;
+        public int IndexInicio => EditIndexInicio - 1;
+        public int EditIndexInicio { get; set; } = DEFAULT;
+        public int IndexFin => EditIndexFin - 1;
         /// <summary>
         /// Si es -1 se entiende que es el mismo que IndexInicio
         /// </summary>
-        public int IndexFin { get; set; } = DEFAULT;
+        public int EditIndexFin { get; set; } = DEFAULT;
         public bool Saltar { get; set; } = false;
 
         public int CharInicio { get; set; } = DEFAULT;
@@ -81,7 +82,7 @@ namespace CommonEbookPretractament
         }
         public override string ToString()
         {
-            return $"{(Saltar ? "#" : string.Empty)} PI:{IndexInicio},PF:{IndexFin},CI:{CharInicio},CF:{CharFin}";
+            return $"{(Saltar ? "#" : string.Empty)} PI:{EditIndexInicio},PF:{EditIndexFin},CI:{CharInicio},CF:{CharFin}";
         }
 
         public static IEnumerable<string> GetParts(List<Spliter> parts, IEnumerable<string> textosATratar, string strJoin = "")

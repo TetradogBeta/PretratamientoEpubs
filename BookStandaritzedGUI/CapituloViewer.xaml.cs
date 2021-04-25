@@ -70,8 +70,8 @@ namespace BookStandaritzedGUI
                 txtFin.Text = parrafoActual.CharFin + "";
                 txtInicio.Text = parrafoActual.CharInicio + "";
 
-                txtIndexFin.Text = parrafoActual.IndexFin + "";
-                txtIndexInicio.Text = parrafoActual.IndexInicio + "";
+                txtIndexFin.Text = parrafoActual.EditIndexFin + "";
+                txtIndexInicio.Text = parrafoActual.EditIndexInicio + "";
 
                 chkbSaltarParrafo.IsChecked = parrafoActual.Saltar;
 
@@ -190,7 +190,7 @@ namespace BookStandaritzedGUI
             int? index = GetIfIsNumberValid(txtIndexInicio);
             if (index.HasValue && ParrafoActual.IndexInicio != index.Value)
             {
-                ParrafoActual.IndexInicio = index.Value - 1;
+                ParrafoActual.EditIndexInicio = index.Value;
                 CheckAndSave();
             }
         }
@@ -200,7 +200,7 @@ namespace BookStandaritzedGUI
             int? index = GetIfIsNumberValid(txtIndexFin);
             if (index.HasValue && ParrafoActual.IndexFin != index.Value)
             {
-                ParrafoActual.IndexFin = index.Value - 1;
+                ParrafoActual.EditIndexFin = index.Value;
                 CheckAndSave();
             }
         }
@@ -326,7 +326,7 @@ namespace BookStandaritzedGUI
         private void rtbVersion_SelectionChanged(object sender, RoutedEventArgs e)
         {
             Point ptrSelection = rtbVersion.GetSelectionRange();
-            tbInfo.Text = $": Index Inicio = {cmbParrafosVersion.SelectedIndex}, Inicio = {ptrSelection.X}, Fin = {ptrSelection.Y}";
+            tbInfo.Text = $": Index Inicio = {cmbParrafosVersion.SelectedIndex+1}, Inicio = {ptrSelection.X}, Fin = {ptrSelection.Y}";
         }
     }
 }

@@ -101,9 +101,9 @@ namespace CommonEbookPretractament
 
         void ISaveAndLoad.Load()
         {
-            string path;
-
-            Version   = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(System.IO.Path.Combine(EbookSplited.Directory, VersionPath)));
+            string path= System.IO.Path.Combine(EbookSplited.Directory, VersionPath);
+            if(File.Exists(path))
+             Version   = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(path));
             if (!Equals(ReferencePath, default))
             {
 
@@ -174,7 +174,7 @@ namespace CommonEbookPretractament
             EbookStandaritzed other = obj as EbookStandaritzed;
             bool equals = !Equals(other, default);
             if (equals)
-                equals = Version.Equals(other.Version);
+                equals = Equals(Version,other.Version);
             return equals;
         }
         public static EbookStandaritzed GetEbookStandaritzed(byte[] data) => (EbookStandaritzed)Serializador.GetObject(data);

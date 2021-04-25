@@ -11,10 +11,10 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer x:Name="scStkVersion" VerticalScrollBarVisibility="Auto">
             <StackPanel x:Name="stkVersion" Background="AntiqueWhite"/>
         </ScrollViewer>
-        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer x:Name="scStkReference" Grid.Column="1" VerticalScrollBarVisibility="Auto">
             <StackPanel x:Name="stkReference" Background="AliceBlue" />
         </ScrollViewer>
     </Grid>

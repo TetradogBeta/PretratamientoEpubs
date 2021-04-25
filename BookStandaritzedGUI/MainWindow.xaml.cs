@@ -59,7 +59,7 @@ namespace BookStandaritzedGUI
             }
             DicStandard.Clear();
             for (int i = 0; i < ebooksStandaritzed.Length; i++)
-                if(!DicStandard.ContainsKey(ebooksStandaritzed[i].Version.SaveName))
+                if(!Equals(ebooksStandaritzed[i].Version,default) && !DicStandard.ContainsKey(ebooksStandaritzed[i].Version.SaveName))
                    DicStandard.Add(ebooksStandaritzed[i].Version.SaveName, ebooksStandaritzed[i]);
 
             Group = default;

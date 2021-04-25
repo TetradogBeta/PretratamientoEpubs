@@ -21,8 +21,8 @@
                 <RowDefinition/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
-            <RichTextBox x:Name="rtbVersion"  Background="AntiqueWhite" SelectionChanged="rtbVersion_SelectionChanged" />
-            <RichTextBox x:Name="rtbOriginal" Grid.Column="1" Background="AliceBlue"/>
+            <RichTextBox x:Name="rtbVersion" IsReadOnly="True" Background="AntiqueWhite" SelectionChanged="rtbVersion_SelectionChanged" />
+            <RichTextBox x:Name="rtbOriginal" IsReadOnly="True" Grid.Column="1" Background="AliceBlue"/>
 
             <ComboBox x:Name="cmbParrafosVersion" Grid.Row="1"  SelectionChanged="cmbParrafosVersion_SelectionChanged"/>
             <ComboBox x:Name="cmbParrafosReference" Grid.Row="1" Grid.Column="1" SelectionChanged="cmbParrafosReference_SelectionChanged"/>
