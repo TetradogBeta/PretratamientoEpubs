@@ -29,7 +29,7 @@ namespace CommonEbookPretractament
         /// </summary>
         public int CharFin { get; set; } = DEFAULT;
 
-        public bool AcabaEnElMismoIndex => IndexFin == DEFAULT || IndexInicio == IndexFin;
+        public bool AcabaEnElMismoIndex => EditIndexFin == DEFAULT || IndexInicio == IndexFin;
 
         public bool IsRelevant =>IsValid && !GetBytes().AreEquals(Empty);
         public bool IsValid => !GetBytes().AreEquals(Invalid);

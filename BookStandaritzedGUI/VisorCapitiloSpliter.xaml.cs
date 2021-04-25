@@ -35,6 +35,10 @@ namespace BookStandaritzedGUI
         public void Refresh()
         {
             parrafosCapitulo.Children.Clear();
+            //valido que los parrafos esten bien
+
+
+
             Parrafos.ForEach((p) =>
             {
                 TextBlock tbParrafo = new TextBlock();
@@ -62,7 +66,17 @@ namespace BookStandaritzedGUI
 
         private void btnViewProgress_Click(object sender, RoutedEventArgs e)
         {
-            new ProgressViewer(Ebook,Chapter).ShowDialog();
+            Notifications.Wpf.Core.NotificationManager manager;
+            try
+            {
+                new ProgressViewer(Ebook, Chapter).ShowDialog();
+            }
+            catch
+            {
+                manager = new Notifications.Wpf.Core.NotificationManager();
+                manager.ShowAsync("Revisa los Spliters!", "Error", new TimeSpan(20 * 1000));
+
+            }
         }
     }
 

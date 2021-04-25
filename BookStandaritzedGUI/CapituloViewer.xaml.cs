@@ -56,8 +56,22 @@ namespace BookStandaritzedGUI
 
         public CapituloViewer()
         {
+            ContextMenu menu;
+            MenuItem menuItem;
             InitializeComponent();
+
+            menu = new ContextMenu();
+            menuItem = new MenuItem() { Header = "Crear Spliters" };
+            menuItem.Click += CrearEnSplitersSeleccion;
+            menu.Items.Add(menuItem);
+            menuItem = new MenuItem() { Header = "Dividir en Spliters" };
+            menuItem.Click += DividirEnSplitersSeleccion;
+            menu.Items.Add(menuItem);
+            rtbVersion.ContextMenu = menu;
         }
+
+
+
         string[] ParrafosCapitulosReference { get; set; }
         string[] ParrafosCapitulosVersion { get; set; }
         Spliter ParrafoActual
@@ -279,7 +293,7 @@ namespace BookStandaritzedGUI
                     {
                         Title = tituloError,
                         Message = "Atención! Has intentado poner como base un descendiente de este mismo...",
-                       
+
                         Type = NotificationType.Error
                     }));
                 }
@@ -326,7 +340,58 @@ namespace BookStandaritzedGUI
         private void rtbVersion_SelectionChanged(object sender, RoutedEventArgs e)
         {
             Point ptrSelection = rtbVersion.GetSelectionRange();
-            tbInfo.Text = $": Index Inicio = {cmbParrafosVersion.SelectedIndex+1}, Inicio = {ptrSelection.X}, Fin = {ptrSelection.Y}";
+            tbInfo.Text = $": Index Inicio = {cmbParrafosVersion.SelectedIndex + 1}, Inicio = {ptrSelection.X}, Fin = {ptrSelection.Y}";
+            tbInfo.Tag = new Nullable<Point>(ptrSelection);
+        }
+        private void DividirEnSplitersSeleccion(object sender, RoutedEventArgs e)
+        {
+            Spliter parrafo, parrafoAux;
+            parrafo = GetParrafoSeleccionado();
+            if (!Equals(parrafo, default))
+            {
+                if (parrafo.CharInicio != 0)
+                {
+                    parrafoAux = new Spliter() { EditIndexInicio = parrafo.EditIndexInicio, CharInicio = 0, CharFin = parrafo.CharInicio };
+                    visorCapitiloSpliter.Parrafos.Add(parrafoAux);
+                }
+                if (parrafo.CharFin != rtbVersion.GetText().Length)
+                {
+                    if (!string.IsNullOrWhiteSpace(rtbVersion.GetText().Substring(parrafo.CharFin)))
+                    {
+                        parrafoAux = new Spliter() { EditIndexInicio = parrafo.EditIndexInicio, CharInicio = parrafo.CharFin, CharFin = -1 };
+                        visorCapitiloSpliter.Parrafos.Add(parrafoAux);
+                    }
+                    else { 
+                        parrafo.CharFin = -1;
+                        ParrafoActual = parrafo;
+                    }
+                }
+                visorCapitiloSpliter.Refresh();
+                ParrafoActual = parrafo;
+            }
+        }
+        private void CrearEnSplitersSeleccion(object sender, RoutedEventArgs e)
+        {
+            Spliter parrafo = GetParrafoSeleccionado();
+            if (!Equals(parrafo, default))
+            {
+                ParrafoActual = parrafo;
+                visorCapitiloSpliter.Refresh();
+            }
+        }
+        Spliter GetParrafoSeleccionado()
+        {
+            Spliter parrafo;
+            Nullable<Point> point;
+            if (rtbVersion.IsSelectionActive && !Equals(tbInfo.Tag, default) && (tbInfo.Tag as Nullable<Point>).HasValue)
+            {
+                point = (tbInfo.Tag as Nullable<Point>);
+                parrafo = new Spliter() { EditIndexInicio = cmbParrafosVersion.SelectedIndex + 1, CharInicio = int.Parse(point.Value.X + ""), CharFin = int.Parse(point.Value.Y + "") };
+                visorCapitiloSpliter.Parrafos.Add(parrafo);
+
+            }
+            else parrafo = default;
+            return parrafo;
         }
     }
 }
