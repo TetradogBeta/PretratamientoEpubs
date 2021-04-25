@@ -23,7 +23,7 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string Version = "Book Standaritzed V1.3c";
+        public static string Version = "Book Standaritzed V1.4";
         public static SortedList<string,EbookStandaritzed> DicStandard { get; set; }
         public static GroupItem Group { get; set; }
         public static bool UnsafeMode { get; set; } = false;
