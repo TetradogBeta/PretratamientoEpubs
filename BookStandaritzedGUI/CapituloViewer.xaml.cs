@@ -81,13 +81,7 @@ namespace BookStandaritzedGUI
             {
                 parrafoActual = value;
 
-                txtFin.Text = parrafoActual.CharFin + "";
-                txtInicio.Text = parrafoActual.CharInicio + "";
-
-                txtIndexFin.Text = parrafoActual.EditIndexFin + "";
-                txtIndexInicio.Text = parrafoActual.EditIndexInicio + "";
-
-                chkbSaltarParrafo.IsChecked = parrafoActual.Saltar;
+                RefreshInterficieParrafo();
 
                 if (!visorCapitiloSpliter.Parrafos.Exists((p) => p.CompareTo(parrafoActual) == 0))
                 {
@@ -101,6 +95,9 @@ namespace BookStandaritzedGUI
 
             }
         }
+
+
+
         public EbookStandaritzed EbookActual
         {
             get => visorCapitiloSpliter.Ebook;
@@ -122,17 +119,34 @@ namespace BookStandaritzedGUI
 
             }
         }
+        private void RefreshInterficieParrafo()
+        {
+            txtFin.Text = parrafoActual.CharFin + "";
+            txtInicio.Text = parrafoActual.CharInicio + "";
+
+            txtIndexFin.Text = parrafoActual.EditIndexFin + "";
+            txtIndexInicio.Text = parrafoActual.EditIndexInicio + "";
+
+            chkbSaltarParrafo.IsChecked = parrafoActual.Saltar;
+        }
         private int GetIndexEbookOriginal(EbookSplited ebook)
         {
             return cmbEbookOriginal.Items.IndexOf(cmbEbookOriginal.Items.ToArray().First((e) => e.Equals(ebook)));
         }
         private void CheckAndSave()
         {
+            List<Spliter> splitersNoValidos = visorCapitiloSpliter.Parrafos.Filtra((p) => !p.IsRelevant);
+            for (int i = 0,f= splitersNoValidos.Count - 1; i < f; i++)
+                visorCapitiloSpliter.Parrafos.Remove(splitersNoValidos[i]);
+            if(splitersNoValidos.Count>0 && !visorCapitiloSpliter.Parrafos.Contains(ParrafoActual))
+                ParrafoActual = splitersNoValidos.First<Spliter>();
 
             EbookActual.Save();
-            visorCapitiloSpliter.Refresh();
+
 
             CheckChapterFinished();
+            RefreshInterficieParrafo();
+            visorCapitiloSpliter.Refresh();
 
             if (HasChanges != null)
                 HasChanges(this, new EventArgs());
