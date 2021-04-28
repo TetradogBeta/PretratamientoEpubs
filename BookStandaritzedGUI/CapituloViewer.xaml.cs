@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -48,11 +49,12 @@ namespace BookStandaritzedGUI
             }
         }
 
-        static List<System.Threading.Tasks.Task> ToDo = new List<System.Threading.Tasks.Task>();
 
         private Spliter parrafoActual;
 
         public event EventHandler HasChanges;
+
+        Guid? LastMessage { get; set; }
 
         public CapituloViewer()
         {
@@ -135,11 +137,25 @@ namespace BookStandaritzedGUI
         }
         private void CheckAndSave()
         {
+            Task tAux;
             List<Spliter> splitersNoValidos = visorCapitiloSpliter.Parrafos.Filtra((p) => !p.IsRelevant);
-            for (int i = 0,f= splitersNoValidos.Count - 1; i < f; i++)
+            for (int i = 0, f = splitersNoValidos.Count - 1; i < f; i++)
                 visorCapitiloSpliter.Parrafos.Remove(splitersNoValidos[i]);
-            if(splitersNoValidos.Count>0 && !visorCapitiloSpliter.Parrafos.Contains(ParrafoActual))
+
+            if (splitersNoValidos.Count > 0 && !visorCapitiloSpliter.Parrafos.Contains(ParrafoActual))
+            {
                 ParrafoActual = splitersNoValidos.First<Spliter>();
+            }
+            if (splitersNoValidos.Count > 1)
+            {
+                if (LastMessage.HasValue)
+                    tAux = MainWindow.Main.CerrarMensaje(LastMessage.Value);
+                else tAux = Task.Delay(1);
+
+                tAux.ContinueWith(t =>
+                       MainWindow.Main.MostrarMensaje("Información", $"Se han eliminado spliters que no eran relevantes {splitersNoValidos.Count - 1}", TimeSpan.FromSeconds(30))
+                      .ContinueWith((t) => LastMessage = t.Result));
+            }
 
             EbookActual.Save();
 
@@ -279,14 +295,19 @@ namespace BookStandaritzedGUI
 
         private void cmbEbookOriginal_SelectionChanged(object sender = null, SelectionChangedEventArgs e = null)
         {
-            NotificationManager notificationManager;
             EbookStandaritzed parent;
             string tituloError;
             if (cmbEbookOriginal.SelectedIndex >= 0)
             {
                 parent = MainWindow.GetReference((cmbEbookOriginal.SelectedItem as DummyEbookSpliter).Ebook);
                 if (EbookActual.IsParentValid(parent))
+                {
+                    if ((!Equals(EbookActual.Reference, default) && !Equals(EbookActual.Reference.Version, parent.Version)))
+                        MainWindow.Main.MostrarMensaje("Información", "Ten en cuenta que los Spliters están pensado para la referencia que habia");
+
                     EbookActual.Reference = parent;
+
+                }
                 else
                 {
                     cmbEbookOriginal.SelectionChanged -= cmbEbookOriginal_SelectionChanged;
@@ -301,15 +322,14 @@ namespace BookStandaritzedGUI
                         cmbEbookOriginal.SelectedIndex = -1;
                     }
                     cmbEbookOriginal.SelectionChanged += cmbEbookOriginal_SelectionChanged;
-                    notificationManager = new NotificationManager();
 
-                    ToDo.Add(notificationManager.ShowAsync(new NotificationContent
-                    {
-                        Title = tituloError,
-                        Message = "Atención! Has intentado poner como base un descendiente de este mismo...",
 
-                        Type = NotificationType.Error
-                    }));
+                    MainWindow.Main.MostrarMensaje(
+                         tituloError,
+                        "Atención! Has intentado poner como base un descendiente de este mismo...",
+                         TimeSpan.FromSeconds(10),
+                         NotificationType.Error
+                     );
                 }
 
                 CheckAndSave();
@@ -318,6 +338,7 @@ namespace BookStandaritzedGUI
             cmbChapters.SelectedIndex = 0;
             cmbChapters.SelectionChanged += cmbChapters_SelectionChanged;
             cmbChapters_SelectionChanged();
+            
 
 
 
@@ -375,7 +396,8 @@ namespace BookStandaritzedGUI
                         parrafoAux = new Spliter() { EditIndexInicio = parrafo.EditIndexInicio, CharInicio = parrafo.CharFin, CharFin = -1 };
                         visorCapitiloSpliter.Parrafos.Add(parrafoAux);
                     }
-                    else { 
+                    else
+                    {
                         parrafo.CharFin = -1;
                         ParrafoActual = parrafo;
                     }

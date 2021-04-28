@@ -4,14 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BookStandaritzedGUI"
+        xmlns:notification="clr-namespace:Notifications.Wpf.Core.Controls;assembly=Notifications.Wpf.Core"
         mc:Ignorable="d"
         Height="450" Width="800" KeyDown="Window_KeyDown">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition MaxWidth="250"/>
-            <ColumnDefinition Width="4*"/>
-        </Grid.ColumnDefinitions>
-        <ListView x:Name="lstEbookSplited"/>
-        <local:CapituloViewer x:Name="capituloViewer" Grid.Column="1" HasChanges="capituloViewer_HasChanges"/>
+    <Grid x:Name="gMain">
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition MaxWidth="250"/>
+                <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+
+            <ListView x:Name="lstEbookSplited"/>
+            <local:CapituloViewer x:Name="capituloViewer" Grid.Column="1" HasChanges="capituloViewer_HasChanges"/>
+        </Grid>
+        
+        <notification:NotificationArea x:Name="notificationArea"  Position="TopRight"/>
     </Grid>
 </Window>

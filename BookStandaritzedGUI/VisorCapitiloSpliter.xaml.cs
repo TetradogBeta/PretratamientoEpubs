@@ -73,8 +73,7 @@ namespace BookStandaritzedGUI
             }
             catch
             {
-                manager = new Notifications.Wpf.Core.NotificationManager();
-                manager.ShowAsync("Revisa los Spliters!", "Error", new TimeSpan(20 * 1000));
+                MainWindow.Main.MostrarMensaje("Revisa los Spliters!", "Error",TimeSpan.FromSeconds(25));
 
             }
         }
