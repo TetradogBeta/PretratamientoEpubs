@@ -33,6 +33,7 @@ namespace BookStandaritzedGUI
 
         bool IsPreviewOn { get; set; }
         bool? EstaUniendo { get; set; }
+        bool ErrorUnir { get; set; }
 
 
         public event EventHandler HasChanges;
@@ -41,6 +42,7 @@ namespace BookStandaritzedGUI
         {
             InitializeComponent();
             Selecteds = new List<TextBlock>();
+            KeyDown += (s, e) => { if (e.Key.HasFlag(Key.F5)) _=Notificaciones.CloseAllMessages(); };
         }
 
         public ProgressViewer(EbookStandaritzed ebook, int chapter) :this()
@@ -77,7 +79,7 @@ namespace BookStandaritzedGUI
             IsPreviewOn = false;
             Selecteds.Clear();
             RefreshButtons();
-
+            ErrorUnir = false;
             stkVersion.Children.Clear();
             stkReference.Children.Clear();
 
@@ -237,6 +239,7 @@ namespace BookStandaritzedGUI
                         }
                     }
                 }
+                ErrorUnir = !correcto;
                 if (correcto)
                 {
                     CommonUnirSaltar();
@@ -256,6 +259,7 @@ namespace BookStandaritzedGUI
             {
                 CommonUnirSaltar(0);
                 EstaUniendo = false;
+                ErrorUnir = false;
             }
             else _ = Notificaciones.ShowMessage("Atención", "Ahora mismo estás uniendo, no puedes saltar, si quieres hacerlo tienes que aplicar o deshacer", nameControl: nameof(notificationsManagerProgress));
         }
@@ -286,6 +290,7 @@ namespace BookStandaritzedGUI
             RefreshButtons();
             IsPreviewOn = false;
             EstaUniendo = null;
+            ErrorUnir = false;
         }
 
         private void btnAplicar_Click(object sender, RoutedEventArgs e)
@@ -293,39 +298,43 @@ namespace BookStandaritzedGUI
             List<Spliter> parrafos;
             int inicio;
             int fin;
-
-            if (IsPreviewOn)
+            if (!ErrorUnir)
             {
-                parrafos = Ebook.GetCapitulo(Chapter).ParrafosEditados;
-                //creo el spliter y lo añado al capitulo que toca
-                if (EstaUniendo.GetValueOrDefault())
+                if (IsPreviewOn)
                 {
-                    //unir
-                    inicio = Selecteds.Min((tb)=>GetIndexTb(tb));
-                    fin = Selecteds.Max((tb) => GetIndexTb(tb));
-                    parrafos.Add(new Spliter() {EditIndexInicio=inicio,EditIndexFin=fin });
-                }
-                else
-                {
-                    //saltar
-                    Selecteds.ForEach((tbSaltar) =>
+                    parrafos = Ebook.GetCapitulo(Chapter).ParrafosEditados;
+                    //creo el spliter y lo añado al capitulo que toca
+                    if (EstaUniendo.GetValueOrDefault())
                     {
-                        inicio =GetIndexTb(tbSaltar);
-                        parrafos.Add(new Spliter() { EditIndexInicio = inicio, Saltar = true });
-                    });
+                        //unir
+                        inicio = Selecteds.Min((tb) => GetIndexTb(tb));
+                        fin = Selecteds.Max((tb) => GetIndexTb(tb));
+                        parrafos.Add(new Spliter() { EditIndexInicio = inicio, EditIndexFin = fin });
+                    }
+                    else
+                    {
+                        //saltar
+                        Selecteds.ForEach((tbSaltar) =>
+                        {
+                            inicio = GetIndexTb(tbSaltar);
+                            parrafos.Add(new Spliter() { EditIndexInicio = inicio, Saltar = true });
+                        });
+                    }
+
+                    if (HasChanges != null)
+                        HasChanges(this, new EventArgs());
+
+
+
+                    Reload();
+                    EstaUniendo = null;
+                    Notificaciones.CloseAllMessages(nameof(notificationsManagerProgress))
+                                  .ContinueWith((t) => Notificaciones.ShowMessage("Información", "Cambios aplicados con éxito!", notificationType: Notifications.Wpf.Core.NotificationType.Success, nameControl: nameof(notificationsManagerProgress)));
                 }
-
-                if (HasChanges != null)
-                    HasChanges(this, new EventArgs());
-
-
-
-                Reload();
-                EstaUniendo = null;
-                 Notificaciones.CloseAllMessages(nameof(notificationsManagerProgress))
-                               .ContinueWith((t)=>Notificaciones.ShowMessage("Información", "Cambios aplicados con éxito!",notificationType:Notifications.Wpf.Core.NotificationType.Success, nameControl: nameof(notificationsManagerProgress)));
+                else _ = Notificaciones.ShowMessage("Atención", "Tienes que unir, saltar los parrafos actuales, sino quieres hacer nada con ellos dale a deshacer.", nameControl: nameof(notificationsManagerProgress));
             }
-            else _= Notificaciones.ShowMessage("Atención", "Tienes que unir, saltar los parrafos actuales, sino quieres hacer nada con ellos dale a deshacer.", nameControl: nameof(notificationsManagerProgress));
+            else _ = Notificaciones.ShowMessage("Atención", "Tienes que arreglar la union de párrafos actual o darle a deshacer",Notifications.Wpf.Core.NotificationType.Error, nameControl: nameof(notificationsManagerProgress));
+
         }
         private int GetIndexTb(TextBlock tb)=> int.Parse((tb.Inlines.FirstInline as Run).Text);
     }
