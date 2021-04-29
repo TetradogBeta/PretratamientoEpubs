@@ -29,8 +29,8 @@ namespace UnitTestReadEpub
 
                 new Spliter()
                 {
-                    IndexInicio=0,
-                    IndexFin=1
+                    EditIndexInicio=0+1,
+                    EditIndexFin=1+1
                 }
 
             };
@@ -56,13 +56,13 @@ namespace UnitTestReadEpub
 
                 new Spliter()
                 {
-                    IndexInicio=0,
+                    EditIndexInicio=0+1,
                     CharFin=resultadoEsperado[0].Length,
 
                 },
                   new Spliter()
                 {
-                    IndexInicio=0,
+                    EditIndexInicio=0+1,
                     CharInicio=resultadoEsperado[0].Length,
 
                 }
@@ -92,14 +92,14 @@ namespace UnitTestReadEpub
 
                 new Spliter()
                 {
-                    IndexInicio=0,
+                    EditIndexInicio=0+1,
                     CharFin=resultadoEsperado[0].Length,
 
                 },
                   new Spliter()
                 {
-                    IndexInicio=0,
-                    IndexFin=1,
+                    EditIndexInicio=0+1,
+                    EditIndexFin=1+1,
                     CharInicio=resultadoEsperado[0].Length,
                     CharFin=1
 
@@ -107,7 +107,7 @@ namespace UnitTestReadEpub
                   
                   new Spliter()
                 {
-                    IndexInicio=1,
+                    EditIndexInicio=1+1,
                     CharInicio=1
 
                 }
@@ -142,14 +142,14 @@ namespace UnitTestReadEpub
 
                 new Spliter()
                 {
-                    IndexInicio=0,
+                    EditIndexInicio=0+1,
                     CharFin=resultadoEsperado[0].Length,
 
                 },
                   new Spliter()
                 {
-                    IndexInicio=0,
-                    IndexFin=1,
+                    EditIndexInicio=0+1,
+                    EditIndexFin=1+1,
                     CharInicio=resultadoEsperado[0].Length,
                     CharFin=1
 
@@ -157,7 +157,7 @@ namespace UnitTestReadEpub
 
                   new Spliter()
                 {
-                    IndexInicio=1,
+                    EditIndexInicio=1+1,
                     CharInicio=1,
                     CharFin=1+resultadoEsperado[2].Length
 
@@ -165,7 +165,7 @@ namespace UnitTestReadEpub
 
                   new Spliter()
                 {
-                    IndexInicio=1,
+                    EditIndexInicio=1+1,
                     CharInicio=1+resultadoEsperado[2].Length
 
                 }
@@ -208,34 +208,34 @@ namespace UnitTestReadEpub
             {
                 new Spliter()
                 {
-                    IndexInicio=1,
+                    EditIndexInicio=1+1,
                     CharFin=6
                 },
                 new Spliter()
                 {
-                    IndexInicio=1,
+                    EditIndexInicio=1+1,
                     CharInicio=6
                 },
                 new Spliter()
                 {
-                    IndexInicio=3,
+                    EditIndexInicio=3+1,
                     Saltar=true
                 },
                 new Spliter()
                 {
-                    IndexInicio=4,
-                    IndexFin=5,
+                    EditIndexInicio=4+1,
+                    EditIndexFin=5+1,
                     CharFin=8
                 },
                 new Spliter()
                 {
-                    IndexInicio=5,
+                    EditIndexInicio=5+1,
                     CharInicio=8,
                     CharFin=8+6
                 },
                 new Spliter()
                 {
-                    IndexInicio=5,
+                    EditIndexInicio=5+1,
                     Saltar=true
                 }
             };

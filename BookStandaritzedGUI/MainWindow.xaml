@@ -6,10 +6,14 @@
         xmlns:local="clr-namespace:BookStandaritzedGUI"
         xmlns:notification="clr-namespace:Notifications.Wpf.Core.Controls;assembly=Notifications.Wpf.Core"
         mc:Ignorable="d"
-        Height="450" Width="800" KeyDown="Window_KeyDown">
+        Height="450" Width="950" KeyDown="Window_KeyDown">
     <Grid x:Name="gMain">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="691*"/>
+            <ColumnDefinition Width="109*"/>
+        </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MaxWidth="250"/>
                 <ColumnDefinition Width="4*"/>
@@ -18,7 +22,7 @@
             <ListView x:Name="lstEbookSplited"/>
             <local:CapituloViewer x:Name="capituloViewer" Grid.Column="1" HasChanges="capituloViewer_HasChanges"/>
         </Grid>
-        
-        <notification:NotificationArea x:Name="notificationArea"  Position="TopRight"/>
+
+        <notification:NotificationArea x:Name="notificationArea"  Position="TopRight" Grid.ColumnSpan="2"/>
     </Grid>
 </Window>

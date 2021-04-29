@@ -24,7 +24,7 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string Version = "Book Standaritzed V2.0B";
+        public static string Version = "Book Standaritzed V2.1";
         public static MainWindow Main { get; set; }
         public static SortedList<string, EbookStandaritzed> DicStandard { get; set; }
         public static GroupItem Group { get; set; }
@@ -46,11 +46,12 @@ namespace BookStandaritzedGUI
             Load();
             if (SugerenciasOn)
             {
-                Task.Delay(1000).ContinueWith((t) => MostrarMensaje("Sugerencia", "Primero se empieza por la base, para poner solo los párrafos con contenido.", TimeSpan.FromSeconds(20)))
-                                .ContinueWith((t) => MostrarMensaje("Información", "Pulsa F1 para desactivar/activar las sugerencias al inicio"))
-                                .ContinueWith((t) => MostrarMensaje("Información", "Pulsa F2 para desactivar/activar las notificaciones"));
+                Task.Delay(1000).ContinueWith((t) => MostrarMensaje("Sugerencia", "Primero se empieza por la base, para poner solo los párrafos con contenido."))
+                                .ContinueWith((t) => MostrarMensaje("Información", "Pulsa F1 para desactivar/activar las sugerencias al inicio", TimeSpan.FromSeconds(7)))
+                                .ContinueWith((t) => MostrarMensaje("Información", "Pulsa F5 para limpiar todas las notificaciones", TimeSpan.FromSeconds(7)));
 
             }
+            Task.Delay(1000).ContinueWith((t) => MostrarMensaje("Información", $"Pulsa F2 para {(NotificacionesOn ? "desactivar" : "activar")} las notificaciones", TimeSpan.FromSeconds(7), forceNotification: !NotificacionesOn));
         }
         public bool SugerenciasOn
         {
@@ -173,13 +174,13 @@ namespace BookStandaritzedGUI
             {
                 SugerenciasOn = !SugerenciasOn;
                 if (LastSugerenciaMode.HasValue)
-                    tAux =  CerrarMensaje(LastSugerenciaMode.Value);
+                    tAux = CerrarMensaje(LastSugerenciaMode.Value);
                 else tAux = Task.Delay(1);
 
                 tAux.ContinueWith(t =>
                         MostrarMensaje("Sugerencias al inicio", SugerenciasOn ? "Están activadas" : "Están desactivadas", TimeSpan.FromSeconds(10), NotificationType.Success)
                        .ContinueWith((t) => LastSugerenciaMode = t.Result))
-                       .ContinueWith((t) => MostrarMensaje("Información", $"Pulsa F1 para {(SugerenciasOn? "desactivar":"activar")} las sugerencias al inicio"));
+                       .ContinueWith((t) => MostrarMensaje("Información", $"Pulsa F1 para {(SugerenciasOn ? "desactivar" : "activar")} las sugerencias al inicio"));
 
 
             }
@@ -191,16 +192,20 @@ namespace BookStandaritzedGUI
                 else tAux = Task.Delay(1);
 
                 tAux.ContinueWith(t =>
-                        MostrarMensaje("Notificaciones", NotificacionesOn ? "Están activadas" : "Están desactivadas", TimeSpan.FromSeconds(10),NotificationType.Success, true)
+                        MostrarMensaje("Notificaciones", NotificacionesOn ? "Están activadas" : "Están desactivadas", TimeSpan.FromSeconds(10), NotificationType.Success, true)
                         .ContinueWith((t) => LastNotificacionMode = t.Result))
-                        .ContinueWith((t) => MostrarMensaje("Información", $"Pulsa F2 para {(NotificacionesOn? "desactivar":"activar")} las notificaciones", default, NotificationType.Information, true));
+                        .ContinueWith((t) => MostrarMensaje("Información", $"Pulsa F2 para {(NotificacionesOn ? "desactivar" : "activar")} las notificaciones", default, NotificationType.Information, true));
 
 
             }
+            else if (e.Key.Equals(Key.F5))
+            {
+                _=Notificaciones.CloseAllMessages();
+            }
         }
-        public async Task<Guid> MostrarMensaje(string title, string content,TimeSpan? time=default, NotificationType tipo = NotificationType.Information, bool forceNotification=false)
+        public async Task<Guid> MostrarMensaje(string title, string content, TimeSpan? time = default, NotificationType tipo = NotificationType.Information, bool forceNotification = false)
         {
-          return await Notificaciones.ShowMessage(title, content, tipo, time, nameof(notificationArea), notificacionesOn: () => NotificacionesOn || forceNotification);
+            return await Notificaciones.ShowMessage(title, content, tipo, time, nameof(notificationArea), notificacionesOn: () => NotificacionesOn || forceNotification);
         }
         public async Task CerrarMensaje(Guid idMensaje)
         {

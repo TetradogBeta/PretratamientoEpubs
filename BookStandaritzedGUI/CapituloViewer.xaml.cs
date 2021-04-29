@@ -82,7 +82,8 @@ namespace BookStandaritzedGUI
             set
             {
                 parrafoActual = value;
-
+                visorSpliterActual.Spliter = value;
+             
                 RefreshInterficieParrafo();
 
                 if (!visorCapitiloSpliter.Parrafos.Exists((p) => p.CompareTo(parrafoActual) == 0))
@@ -106,6 +107,7 @@ namespace BookStandaritzedGUI
             set
             {
                 visorCapitiloSpliter.Ebook = value;
+                visorSpliterActual.Ebook = value;
                 ParrafoActual = new Spliter();
                 if (!Equals(MainWindow.Group, default))
                 {
@@ -130,6 +132,7 @@ namespace BookStandaritzedGUI
             txtIndexInicio.Text = parrafoActual.EditIndexInicio + "";
 
             chkbSaltarParrafo.IsChecked = parrafoActual.Saltar;
+            visorSpliterActual.Refresh();
         }
         private int GetIndexEbookOriginal(EbookSplited ebook)
         {
@@ -289,6 +292,7 @@ namespace BookStandaritzedGUI
                 visorCapitiloSpliter.Chapter = cmbChapters.SelectedIndex;
                 CheckChapterFinished();
                 tbInfo.Text = "";
+                visorSpliterActual.Chapter = cmbChapters.SelectedIndex;
 
             }
         }
@@ -324,7 +328,7 @@ namespace BookStandaritzedGUI
                     cmbEbookOriginal.SelectionChanged += cmbEbookOriginal_SelectionChanged;
 
 
-                    MainWindow.Main.MostrarMensaje(
+                    _=MainWindow.Main.MostrarMensaje(
                          tituloError,
                         "Atención! Has intentado poner como base un descendiente de este mismo...",
                          TimeSpan.FromSeconds(10),

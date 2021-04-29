@@ -21,6 +21,9 @@
     <Compile Update="VisorCapitiloSpliter.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="VisorSpliter.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="CapituloViewer.xaml">
@@ -36,6 +39,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="VisorCapitiloSpliter.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="VisorSpliter.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

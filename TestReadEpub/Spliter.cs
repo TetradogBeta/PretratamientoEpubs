@@ -83,11 +83,11 @@ namespace CommonEbookPretractament
             return $"{(Saltar ? "#" : string.Empty)} PI:{EditIndexInicio},PF:{EditIndexFin},CI:{CharInicio},CF:{CharFin}";
         }
 
-        public static IEnumerable<string> GetParts(List<Spliter> parts, IEnumerable<string> textosATratar, string strJoin = "")
+        public static IEnumerable<string> GetParts(List<Spliter> parts, IEnumerable<string> textosATratar, string strJoin = "", bool saltarStrSinPartes = false)
         {
-            return GetParts(parts, textosATratar.ToList(), strJoin);
+            return GetParts(parts, textosATratar.ToList(), strJoin,saltarStrSinPartes);
         }
-        public static IEnumerable<string> GetParts(List<Spliter> parts, IList<string> strsVer, string strJoin = "")
+        public static IEnumerable<string> GetParts(List<Spliter> parts, IList<string> strsVer, string strJoin = "",bool saltarStrSinPartes=false)
         {//que transformaciones se hacen con los Parrafos editados para convertir la version en el original
          //asi se puede usar para dividir frases
 
@@ -98,8 +98,9 @@ namespace CommonEbookPretractament
 
             parts.Sort();//mirar si ordena bien
             //los parrafos que son identicos antes de encontrar uno editado
-            for (int i = 0; i < parts[0].IndexInicio; i++)
-                yield return strsVer[posActual++];
+            for (int i = 0; i < parts[0].IndexInicio; i++, posActual++)
+                if(!saltarStrSinPartes)
+                  yield return strsVer[posActual];
             //mix parrafos saltados,splited,joined,enteros
             for (int i = 0, fCount = strsVer.Count - 1; i < parts.Count && posActual < strsVer.Count; i++)
             {
@@ -185,17 +186,19 @@ namespace CommonEbookPretractament
 
                         }
                     }
-                    else
+                    else 
                     {//entero
                         i--;//se que no es muy correcto pero es una solución...
-                        yield return strsVer[posActual++];
+                        if (!saltarStrSinPartes)
+                            yield return strsVer[posActual];
+                        posActual++;
 
                     }
                 }
             }
 
             //los parrafos que son identicos después de encontrar el último editado
-            for (int i = posActual; i < strsVer.Count; i++)
+            for (int i = posActual; i < strsVer.Count && !saltarStrSinPartes; i++)
                 yield return strsVer[i];
 
         }

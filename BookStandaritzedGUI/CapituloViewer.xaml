@@ -6,6 +6,11 @@
              xmlns:local="clr-namespace:BookStandaritzedGUI"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" Background="White">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="150"/>
+        </Grid.ColumnDefinitions>
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -90,5 +95,8 @@
             <ComboBox x:Name="cmbChapters" SelectionChanged="cmbChapters_SelectionChanged"/>
             <ComboBox x:Name="cmbEbookOriginal" SelectionChanged="cmbEbookOriginal_SelectionChanged" Grid.Column="1"/>
         </Grid>
+    </Grid>
+
+        <local:VisorSpliter x:Name="visorSpliterActual" Grid.Column="1"/>
     </Grid>
 </UserControl>
