@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CommonEbookPretractament;
+using Notifications.Wpf.Core;
 
 namespace BooksSplitedGUI
 {
@@ -23,11 +24,16 @@ namespace BooksSplitedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        EbookSplited Selected { get; set; }
+
         public static SortedList<string, EbookSplited> DicBooksSaved { get; set; }= new SortedList<string, EbookSplited>();
+    public static string NameNotificationControl { get; private set; }
+        EbookSplited Selected { get; set; }
+
         public MainWindow()
         {
+         
             InitializeComponent();
+            Notificaciones.NameControlNotifications=nameof(notificacionManager);
 
             UpdateFolders();
             
@@ -109,7 +115,7 @@ namespace BooksSplitedGUI
             }
             else
             {
-                MessageBox.Show("Se requiere un títuloOriginal;idioma", "Atención", MessageBoxButton.OK,MessageBoxImage.Information);
+                _ = Notificaciones.ShowMessage("Atención", "Se requiere un títuloOriginal;idioma");
             }
 
         }
@@ -121,6 +127,7 @@ namespace BooksSplitedGUI
                 UpdateFolders();
             }
         }
+
         public static void UpdateDicBooks()
         {
             DicBooksSaved.Clear();

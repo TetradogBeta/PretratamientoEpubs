@@ -4,41 +4,46 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BooksSplitedGUI"
+        xmlns:notificacion="clr-namespace:Notifications.Wpf.Core.Controls;assembly=Notifications.Wpf.Core"
         mc:Ignorable="d"
-        Title="BookSplited GUI V1.4" Height="450" Width="800" KeyDown="Window_KeyDown">
+        Title="BookSplited GUI V1.5" Height="450" Width="800" KeyDown="Window_KeyDown">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="4*"/>
-        </Grid.ColumnDefinitions>
-        <ListBox x:Name="lstFolders" SelectionChanged="lstFolders_SelectionChanged"/>
-        <Grid Grid.Column="1">
+        <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="450"/>
                 <ColumnDefinition/>
+                <ColumnDefinition Width="4*"/>
             </Grid.ColumnDefinitions>
-            <ListBox x:Name="lstBooksFolder" Grid.Column="1" SelectionChanged="lstBooksFolder_SelectionChanged"/>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition Height="35"/>
-                </Grid.RowDefinitions>
-            <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
-            <UniformGrid x:Name="ugChaptersBook" Columns="3"/>
-            </ScrollViewer>
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="75"/>
-                    </Grid.ColumnDefinitions>
-                
-                    <TextBox x:Name="txtNameFile"  ToolTip="títuloOriginal;idioma" FontSize="25" />
-                
-                    <Viewbox Grid.Column="1">
-                    <Button x:Name="btnLoadChapters" Content="Set Name" Click="btnLoadChapters_Click" />
-                    </Viewbox>
+            <ListBox x:Name="lstFolders" SelectionChanged="lstFolders_SelectionChanged"/>
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="450"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <ListBox x:Name="lstBooksFolder" Grid.Column="1" SelectionChanged="lstBooksFolder_SelectionChanged"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
+                        <UniformGrid x:Name="ugChaptersBook" Columns="3"/>
+                    </ScrollViewer>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="75"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="txtNameFile"  ToolTip="títuloOriginal;idioma" FontSize="25" />
+
+                        <Viewbox Grid.Column="1">
+                            <Button x:Name="btnLoadChapters" Content="Set Name" Click="btnLoadChapters_Click" />
+                        </Viewbox>
+                    </Grid>
                 </Grid>
             </Grid>
+
         </Grid>
+        <notificacion:NotificationArea x:Name="notificacionManager" Position="BottomLeft"/>
     </Grid>
 </Window>

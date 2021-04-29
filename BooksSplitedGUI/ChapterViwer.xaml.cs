@@ -23,20 +23,20 @@ namespace BooksSplitedGUI
     /// </summary>
     public partial class ChapterViwer : UserControl
     {
-        static List<System.Threading.Tasks.Task> ToDo = new List<System.Threading.Tasks.Task>();
+
         public ChapterViwer()
         {
             InitializeComponent();
             txtContent.PreviewMouseLeftButtonDown += txtContent_MouseLeftButtonDown;
 
         }
-        public ChapterViwer(EbookSplited ebookSplited,int chapter):this()
+        public ChapterViwer(EbookSplited ebookSplited, int chapter) : this()
         {
 
             EbookSplited = ebookSplited;
             Chapter = chapter;
 
-            txtContent.Text =string.Join('\n', EbookSplited.Ebook.GetContentElements(Chapter).Take(3));
+            txtContent.Text = string.Join('\n', EbookSplited.Ebook.GetContentElements(Chapter).Take(3));
             Update();
         }
         public int Chapter { get; set; }
@@ -56,8 +56,11 @@ namespace BooksSplitedGUI
         }
         private void txtContent_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            NotificationManager notificationManager;
+            SaveEbookActual();
+        }
 
+        public void SaveEbookActual()
+        {
             if (EbookSplited.IsOkey)
             {
                 EbookSplited.CapitulosAOmitir[Chapter] = !EbookSplited.CapitulosAOmitir[Chapter];
@@ -70,26 +73,22 @@ namespace BooksSplitedGUI
             }
             else
             {
-                notificationManager = new NotificationManager();
 
-                ToDo.Add(notificationManager.ShowAsync(new NotificationContent
-                {
-                    Title = "Atención!",
-                    Message = "Debe poner  tituloOriginal;idioma y darle a SetName",
-                    Type = NotificationType.Error
-                }));
+                _ = Notificaciones.ShowMessage("Atención!", "Debe poner  tituloOriginal;idioma y darle a SetName", NotificationType.Error);
+
             }
         }
+
         public static ChapterViwer[] GetChapters(EbookSplited ebookSplited)
         {
             ChapterViwer[] chapters = new ChapterViwer[ebookSplited.Ebook.TotalChapters];
-            for(int i=0;i<chapters.Length;i++)
+            for (int i = 0; i < chapters.Length; i++)
             {
                 chapters[i] = new ChapterViwer(ebookSplited, i);
             }
             return chapters;
         }
 
-      
+
     }
 }

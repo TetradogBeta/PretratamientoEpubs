@@ -4,18 +4,44 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BookStandaritzedGUI"
+        xmlns:notificiations="clr-namespace:Notifications.Wpf.Core.Controls;assembly=Notifications.Wpf.Core"
         mc:Ignorable="d"
         Title="ProgressViewer" Height="450" Width="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <ScrollViewer x:Name="scStkVersion" VerticalScrollBarVisibility="Auto">
-            <StackPanel x:Name="stkVersion" Background="AntiqueWhite"/>
-        </ScrollViewer>
-        <ScrollViewer x:Name="scStkReference" Grid.Column="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel x:Name="stkReference" Background="AliceBlue" />
-        </ScrollViewer>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <ScrollViewer x:Name="scStkVersion" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="stkVersion" Background="AntiqueWhite"/>
+            </ScrollViewer>
+            <ScrollViewer x:Name="scStkReference" Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="stkReference" Background="AliceBlue" />
+            </ScrollViewer>
+        </Grid>
+        <notificiations:NotificationArea x:Name="notificationsManagerProgress"/>
+        
+        <Grid x:Name="gButtons" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            
+            <Button x:Name="btnUnir" Content="Unir" Click="btnUnir_Click"/>
+            <Button x:Name="btnSaltar" Content="Saltar" Click="btnSaltar_Click" Grid.Column="1"/>
+            <Button x:Name="btnDeshacer" Content="Deshacer" Click="btnDeshacer_Click" Grid.Column="2"/>
+            <Button x:Name="btnAplicar" Content="Aplicar" Click="btnAplicar_Click" Grid.Column="3"/>
+
+        </Grid>
+    
+
     </Grid>
 </Window>

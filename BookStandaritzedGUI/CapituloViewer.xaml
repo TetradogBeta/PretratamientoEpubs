@@ -80,7 +80,7 @@
 
 
             </StackPanel>
-            <local:VisorCapitiloSpliter x:Name="visorCapitiloSpliter"  Grid.Column="1" SpliterSelected="visorCapitiloSpliter_SpliterSelected" />
+            <local:VisorCapitiloSpliter x:Name="visorCapitiloSpliter"  Grid.Column="1" SpliterSelected="visorCapitiloSpliter_SpliterSelected" HasChanges="visorCapitiloSpliter_HasChanges"/>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>

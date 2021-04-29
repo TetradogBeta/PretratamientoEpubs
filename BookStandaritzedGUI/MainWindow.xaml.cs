@@ -24,14 +24,13 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string Version = "Book Standaritzed V1.6";
+        public static string Version = "Book Standaritzed V2.0B";
         public static MainWindow Main { get; set; }
         public static SortedList<string, EbookStandaritzed> DicStandard { get; set; }
         public static GroupItem Group { get; set; }
         public static bool UnsafeMode { get; set; } = false;
 
         static string UnsafeString => UnsafeMode ? "Unsafe" : "";
-        NotificationManager Manager { get; set; } = new NotificationManager();
 
         Guid? LastSugerenciaMode { get; set; }
         Guid? LastNotificacionMode { get; set; }
@@ -201,24 +200,13 @@ namespace BookStandaritzedGUI
         }
         public async Task<Guid> MostrarMensaje(string title, string content,TimeSpan? time=default, NotificationType tipo = NotificationType.Information, bool forceNotification=false)
         {
-            Guid id;
-
-            if (NotificacionesOn || forceNotification)
-            {
-                id = new Guid();
-                await Manager.ShowAsync(id,
-                    new NotificationContent { Title = title, Message = content, Type = tipo },
-                    areaName: "notificationArea", expirationTime: time
-                    );
-            }
-            else id = default;
-
-            return id;
+          return await Notificaciones.ShowMessage(title, content, tipo, time, nameof(notificationArea), notificacionesOn: () => NotificacionesOn || forceNotification);
         }
         public async Task CerrarMensaje(Guid idMensaje)
         {
-            await Manager.CloseAsync(idMensaje);
+            await idMensaje.CloseMessage();
         }
+
     }
 
 }

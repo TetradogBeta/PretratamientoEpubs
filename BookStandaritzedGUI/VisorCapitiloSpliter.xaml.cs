@@ -24,6 +24,8 @@ namespace BookStandaritzedGUI
 
         public event EventHandler<SpliterEventArgs> SpliterSelected;
 
+        public event EventHandler HasChanges;
+
         public VisorCapitiloSpliter()
         {
             InitializeComponent();
@@ -66,14 +68,28 @@ namespace BookStandaritzedGUI
 
         private void btnViewProgress_Click(object sender, RoutedEventArgs e)
         {
-            Notifications.Wpf.Core.NotificationManager manager;
+            ProgressViewer progress;
             try
             {
-                new ProgressViewer(Ebook, Chapter).ShowDialog();
+                progress = new ProgressViewer(Ebook, Chapter);
+                progress.HasChanges += (s, e) => {
+                    Action act = () =>
+                    {
+                        Refresh();
+                        
+
+                    };
+                    Dispatcher.BeginInvoke(act);
+                    if (HasChanges != null)
+                        HasChanges(this, new EventArgs());
+                
+                
+                };
+                progress.ShowDialog();
             }
-            catch
+            catch(Exception ex)
             {
-                MainWindow.Main.MostrarMensaje("Revisa los Spliters!", "Error",TimeSpan.FromSeconds(25));
+                _=MainWindow.Main.MostrarMensaje("Exception", ex.Message,TimeSpan.FromSeconds(25));
 
             }
         }

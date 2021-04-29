@@ -303,7 +303,7 @@ namespace BookStandaritzedGUI
                 if (EbookActual.IsParentValid(parent))
                 {
                     if ((!Equals(EbookActual.Reference, default) && !Equals(EbookActual.Reference.Version, parent.Version)))
-                        MainWindow.Main.MostrarMensaje("Información", "Ten en cuenta que los Spliters están pensado para la referencia que habia");
+                        _=MainWindow.Main.MostrarMensaje("Información", "Ten en cuenta que los Spliters están pensado para la referencia que habia");
 
                     EbookActual.Reference = parent;
 
@@ -428,6 +428,12 @@ namespace BookStandaritzedGUI
             }
             else parrafo = default;
             return parrafo;
+        }
+
+        private void visorCapitiloSpliter_HasChanges(object sender, EventArgs e)
+        {
+            Action act = () => CheckAndSave();
+            Dispatcher.BeginInvoke(act);
         }
     }
 }

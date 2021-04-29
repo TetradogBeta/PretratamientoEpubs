@@ -12,7 +12,6 @@ namespace CommonEbookPretractament
         const int DEFAULT = -1;
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<Spliter>();
         static readonly byte[] Empty = Serializador.GetBytes(new Spliter());
-        static readonly byte[] Invalid = Serializador.GetBytes(new Spliter() { Saltar = true });
         ElementoBinario IElementoBinarioComplejo.Serialitzer => Serializador;
         public int IndexInicio => EditIndexInicio - 1;
         public int EditIndexInicio { get; set; } = 1;
@@ -32,7 +31,8 @@ namespace CommonEbookPretractament
         public bool AcabaEnElMismoIndex => EditIndexFin == DEFAULT || IndexInicio == IndexFin;
 
         public bool IsRelevant => IsValid && !GetBytes().AreEquals(Empty);
-        public bool IsValid => !GetBytes().AreEquals(Invalid);
+        bool IndexRangeOk => IndexFin <= DEFAULT || IndexInicio <= IndexFin;
+        public bool IsValid => IndexRangeOk && (Saltar || !(CharInicio > CharFin && CharFin > DEFAULT));
         public byte[] GetBytes() => Serializador.GetBytes(this);
 
 
@@ -51,9 +51,7 @@ namespace CommonEbookPretractament
             int compareTo = !Equals(other, default) ? 0 : 1;
             if (compareTo == 0)
             {
-                compareTo = Saltar.CompareTo(other.Saltar) * -1;
-                if (compareTo == 0)
-                {
+            
                     compareTo = IndexInicio.CompareTo(other.IndexInicio);
                     if (compareTo == 0)
                     {
@@ -67,7 +65,7 @@ namespace CommonEbookPretractament
                             }
                         }
                     }
-                }
+                
 
             }
             return compareTo;//asi los ordeno de mas pequeño a mayor
@@ -201,6 +199,16 @@ namespace CommonEbookPretractament
                 yield return strsVer[i];
 
         }
+        public static bool IndexNotIn(IList<Spliter> spliters, int index)
+        {
+            bool notIn = true;
+            for (int i = 0; i < spliters.Count && notIn; i++)
+            {
+                notIn =!spliters[i].IsRelevant || (!spliters[i].Saltar || spliters[i].EditIndexInicio!=index)&&(spliters[i].EditIndexInicio != index && (spliters[i].IndexFin <= DEFAULT || (index > spliters[i].EditIndexFin || index<spliters[i].EditIndexInicio)));
+            }
+            return notIn;
+        }
     }
     //quizás hará falta hacer otra clase para frase que mire el parrafo que empieza y en cual acaba...depende del tamaño del <p>
+
 }
