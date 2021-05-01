@@ -132,13 +132,12 @@ namespace BookStandaritzedGUI
             posIndexVersion = 0;
             parrafos = Ebook.Version.GetContentElementsArray(Chapter);
             capitulo = Ebook.GetCapitulo(Chapter);
-
             foreach (UIElement element in stkVersion.Children)
             {
                 tb = element as TextBlock;
                 strTb = tb.Tag.ToString();
                 text = strTb.Split(SEPARACION)[1];
-                while (!text.Contains(parrafos[posIndexVersion])) posIndexVersion++;
+                while (!parrafos[posIndexVersion].Contains(text)) posIndexVersion++;
 
                 line = new Run((posIndexVersion + 1).ToString().PadLeft(3, '0'));
                 line.Foreground = Spliter.IndexNotIn(capitulo.ParrafosEditados, posIndexVersion + 1) ? Brushes.DarkRed : Brushes.DarkViolet;
@@ -146,6 +145,7 @@ namespace BookStandaritzedGUI
                 tb.Inlines.InsertAfter(line, new Run(":") { Foreground = Brushes.Gray });
                 tb.Tag = line.Text + ":" + strTb;
             }
+
             stkVersion.Tag = stkVersion.Children.ToArray();
             stkReference.Tag = stkReference.Children.ToArray();
 
