@@ -46,5 +46,17 @@ namespace BookStandaritzedGUI.Properties {
                 this["NotificacionesOn"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int HeightMultiplicator {
+            get {
+                return ((int)(this["HeightMultiplicator"]));
+            }
+            set {
+                this["HeightMultiplicator"] = value;
+            }
+        }
     }
 }

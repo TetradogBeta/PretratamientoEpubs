@@ -24,7 +24,7 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string Version = "Book Standaritzed V2.1";
+        public static string Version = "Book Standaritzed V2.2";
         public static MainWindow Main { get; set; }
         public static SortedList<string, EbookStandaritzed> DicStandard { get; set; }
         public static GroupItem Group { get; set; }
@@ -46,12 +46,12 @@ namespace BookStandaritzedGUI
             Load();
             if (SugerenciasOn)
             {
-                Task.Delay(1000).ContinueWith((t) => MostrarMensaje("Sugerencia", "Primero se empieza por la base, para poner solo los párrafos con contenido."))
+                Task.Delay(100).ContinueWith((t) => MostrarMensaje("Sugerencia", "Primero se empieza por el orignal para poner solo los párrafos con contenido.Así todas las traducciones/versiones podrán hacerse sin problemas, ya que no se puede añadir contenido."))
                                 .ContinueWith((t) => MostrarMensaje("Información", "Pulsa F1 para desactivar/activar las sugerencias al inicio", TimeSpan.FromSeconds(7)))
                                 .ContinueWith((t) => MostrarMensaje("Información", "Pulsa F5 para limpiar todas las notificaciones", TimeSpan.FromSeconds(7)));
 
             }
-            Task.Delay(1000).ContinueWith((t) => MostrarMensaje("Información", $"Pulsa F2 para {(NotificacionesOn ? "desactivar" : "activar")} las notificaciones", TimeSpan.FromSeconds(7), forceNotification: !NotificacionesOn));
+            Task.Delay(100).ContinueWith((t) => MostrarMensaje("Información", $"Pulsa F2 para {(NotificacionesOn ? "desactivar" : "activar")} las notificaciones", TimeSpan.FromSeconds(7), forceNotification: !NotificacionesOn));
         }
         public bool SugerenciasOn
         {

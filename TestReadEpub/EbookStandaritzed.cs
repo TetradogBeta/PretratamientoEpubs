@@ -7,7 +7,7 @@ using Gabriel.Cat.S.Extension;
 
 namespace CommonEbookPretractament
 {
-    public class EbookStandaritzed :ISaveAndLoad, IElementoBinarioComplejo
+    public class EbookStandaritzed : ISaveAndLoad, IElementoBinarioComplejo
     {
         public static readonly ElementoBinario Serializador = ElementoBinario.GetSerializador<EbookStandaritzed>();
 
@@ -21,7 +21,7 @@ namespace CommonEbookPretractament
                 System.IO.Directory.CreateDirectory(Directory);
         }
         public EbookStandaritzed() { CapitulosEditados = new Capitulo[1]; }
-        public EbookStandaritzed(EbookSplited ebookSplitedVersion,EbookSplited ebookSplitedReference = default)
+        public EbookStandaritzed(EbookSplited ebookSplitedVersion, EbookSplited ebookSplitedReference = default)
         {
             if (Equals(ebookSplitedVersion, default))
             {
@@ -74,25 +74,25 @@ namespace CommonEbookPretractament
             {
                 ReferencePath = default;
             }
-            VersionPath   =System.IO.Path.GetRelativePath(EbookSplited.Directory,  Version.SavePath);
+            VersionPath = System.IO.Path.GetRelativePath(EbookSplited.Directory, Version.SavePath);
 
             for (int i = 0; i < CapitulosEditados.Length && RemoveDummy; i++)
-                if (!Equals(CapitulosEditados[i],default) && !CapitulosEditados[i].IsRelevant)
+                if (!Equals(CapitulosEditados[i], default) && !CapitulosEditados[i].IsRelevant)
                     CapitulosEditados[i] = default;
         }
 
         public bool IsParentValid(EbookStandaritzed parent)
         {
-            bool hasParent=false;
+            bool hasParent = false;
             //si el parent tiene referencia a este ebook no es valido
-            while (!hasParent && !Equals(parent.Reference, default) && !Equals(parent, parent.Reference)) 
+            while (!hasParent && !Equals(parent.Reference, default) && !Equals(parent, parent.Reference))
             {
 
                 hasParent = Equals(SavePath, parent.Reference.SavePath);
                 if (!hasParent)
                     parent = parent.Reference;
 
-            } 
+            }
 
 
 
@@ -101,26 +101,26 @@ namespace CommonEbookPretractament
 
         void ISaveAndLoad.Load()
         {
-            string path= System.IO.Path.Combine(EbookSplited.Directory, VersionPath);
-            if(File.Exists(path))
-             Version   = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(path));
+            string path = System.IO.Path.Combine(EbookSplited.Directory, VersionPath);
+            if (File.Exists(path))
+                Version = EbookSplited.GetEbookSplited(System.IO.File.ReadAllBytes(path));
             if (!Equals(ReferencePath, default))
             {
 
                 path = System.IO.Path.Combine(EbookStandaritzed.Directory, ReferencePath);
-                if(File.Exists(path))
-                  Reference = EbookStandaritzed.GetEbookStandaritzed(System.IO.File.ReadAllBytes(path));
+                if (File.Exists(path))
+                    Reference = EbookStandaritzed.GetEbookStandaritzed(System.IO.File.ReadAllBytes(path));
                 else Reference = new EbookStandaritzed() { Version = this.Version };
             }
             else
             {
                 Reference = new EbookStandaritzed() { Version = this.Version };
             }
-  
+
         }
         public byte[] GetBytes() => Serializador.GetBytes(this);
 
-        public void Save(bool removeDummy=false)
+        public void Save(bool removeDummy = false)
         {
             RemoveDummy = removeDummy;
             GetBytes().Save(SavePath);
@@ -136,15 +136,24 @@ namespace CommonEbookPretractament
         }
         public IEnumerable<string> GetContentElements(int chapter)
         {
-            return chapter<CapitulosEditados.Length? GetCapitulo(chapter).GetParrafos(Version, chapter):new string[0];
+            return chapter < CapitulosEditados.Length ? GetCapitulo(chapter).GetParrafos(Version, chapter) : new string[0];
+        }
+        public IEnumerable<string[]> GetContentElementsSplited(int chapter)
+        {
+            const string JOINER = "<JOIN STRING>";
+            if (chapter < CapitulosEditados.Length)
+                foreach (string str in GetCapitulo(chapter).GetParrafos(Version, chapter, JOINER))
+                {
+                    yield return str.Contains(JOINER) ? str.Split(JOINER) : new string[] { str };
+                }
         }
         public string[] GetContentElementsArray(int chapter) => GetContentElements(chapter).ToArray();
 
         public bool Finished()
         {
 
-            int  pos=0;
-            bool continuar= !Equals(Version, Reference.Version);
+            int pos = 0;
+            bool continuar = !Equals(Version, Reference.Version);
 
             bool finished = !continuar;
             if (continuar)
@@ -155,7 +164,7 @@ namespace CommonEbookPretractament
                 {
                     continuar = Finished(pos);
                     pos++;
-                } 
+                }
 
                 finished = pos == Reference.TotalChapters;
 
@@ -163,7 +172,7 @@ namespace CommonEbookPretractament
 
             return finished;
         }
-        public bool Finished(int chapter)=>GetContentElementsArray(chapter).Length == Reference.GetContentElementsArray(chapter).Length;
+        public bool Finished(int chapter) => GetContentElementsArray(chapter).Length == Reference.GetContentElementsArray(chapter).Length;
         public override string ToString()
         {
             string refName = Reference != null ? Reference.Version.ToString() : "NULL";
@@ -174,7 +183,7 @@ namespace CommonEbookPretractament
             EbookStandaritzed other = obj as EbookStandaritzed;
             bool equals = !Equals(other, default);
             if (equals)
-                equals = Equals(Version,other.Version);
+                equals = Equals(Version, other.Version);
             return equals;
         }
         public static EbookStandaritzed GetEbookStandaritzed(byte[] data) => (EbookStandaritzed)Serializador.GetObject(data);
@@ -185,7 +194,7 @@ namespace CommonEbookPretractament
 
         }
 
-      
+
     }
 
 }

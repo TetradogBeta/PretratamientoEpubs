@@ -21,12 +21,26 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class ProgressViewer : Window
     {
+        const string SEPARACION = " ~ ";
+        const int HEIGHTUNIT = 20;
+
+
         static readonly FontFamily FontFamilyDefault = new TextBlock().FontFamily;
         static readonly FontFamily FontFamilySelected = new FontFamily("Constantia");
-        static double DefaultHeight;
-        const string SEPARACION = " ~ ";
 
-        int Pos { get; set; }
+
+
+        public static int HeightMultiplicator
+        {
+            get => Properties.Settings.Default.HeightMultiplicator;
+            set
+            {
+                Properties.Settings.Default.HeightMultiplicator = value;
+                Properties.Settings.Default.Save();
+            }
+        }
+
+        int PosIndex { get; set; }
         List<TextBlock> Selecteds { get; set; }
         EbookStandaritzed Ebook { get; set; }
         int Chapter { get; set; }
@@ -42,10 +56,37 @@ namespace BookStandaritzedGUI
         {
             InitializeComponent();
             Selecteds = new List<TextBlock>();
-            KeyDown += (s, e) => { if (e.Key.HasFlag(Key.F5)) _=Notificaciones.CloseAllMessages(); };
+            KeyDown += (s, e) =>
+            {
+
+                if (e.Key.Equals(Key.F5)) _ = Notificaciones.CloseAllMessages();
+                else if (e.Key.Equals(Key.F3))
+                {
+                    if (HeightMultiplicator > 1)
+                    {
+                        HeightMultiplicator--;
+                        RefreshHeight();
+                    }
+                }
+                else if (e.Key.Equals(Key.F4))
+                {
+                    if (HeightMultiplicator < 20)
+                    {
+                        HeightMultiplicator++;
+                        RefreshHeight();
+                    }
+                }
+                else if (e.Key.Equals(Key.F11))
+                {
+
+                    HeightMultiplicator = 1;
+                    RefreshHeight();
+
+                }
+            };
         }
 
-        public ProgressViewer(EbookStandaritzed ebook, int chapter) :this()
+        public ProgressViewer(EbookStandaritzed ebook, int chapter) : this()
         {
 
 
@@ -54,23 +95,22 @@ namespace BookStandaritzedGUI
             Ebook = ebook;
             Chapter = chapter;
             Reload();
-            Task.Delay(100).ContinueWith((t) => {
-                Action act = () =>
-                {
-                    if (stkReference.Children.Count > 0)
-                        DefaultHeight = ((TextBlock)stkReference.Children[0]).ActualHeight;
-                };
-                Dispatcher.BeginInvoke(act);
+            Task.Delay(100).ContinueWith((t) =>
+            {
                 _ = Notificaciones.ShowMessage("Sugerencia", "Pulsa 'ctrl' para poder seleccionar/deseleccionar un parrafo", nameControl: nameof(notificationsManagerProgress), notificacionesOn: () => MainWindow.Main.SugerenciasOn);
                 _ = Notificaciones.ShowMessage("Sugerencia", "Si unes se supone que va del indice más pequeño al más grande", nameControl: nameof(notificationsManagerProgress), notificacionesOn: () => MainWindow.Main.SugerenciasOn);
-             });
+                _ = Notificaciones.ShowMessage("Información", "Pulsa F4 para hacer más grandes los bloques de texto", nameControl: nameof(notificationsManagerProgress));
+                _ = Notificaciones.ShowMessage("Información", "Pulsa F3 para hacer más pequeños los bloques de texto", nameControl: nameof(notificationsManagerProgress));
+                _ = Notificaciones.ShowMessage("Información", "Pulsa F11 para resetear la altura de los bloques de texto", nameControl: nameof(notificationsManagerProgress));
+
+            });
         }
 
         private void Reload()
         {
             string[] parrafos;
             TextBlock tb;
-            int pos;
+            int posIndexVersion;
             Run line;
             string strTb;
             string text;
@@ -83,13 +123,13 @@ namespace BookStandaritzedGUI
             stkVersion.Children.Clear();
             stkReference.Children.Clear();
 
-            Pos = 0;
-            stkVersion.Children.AddRange(Ebook.GetContentElementsArray(Chapter).Convert(StringToView));
-            Pos = 0;
-            stkReference.Children.AddRange(Ebook.Reference.GetContentElementsArray(Chapter).Convert(StringToView));
+            PosIndex = 0;
+            stkVersion.Children.AddRange(Ebook.GetContentElementsSplited(Chapter).Select((s) => StringToView(s)));
+            PosIndex = 0;
+            stkReference.Children.AddRange(Ebook.Reference.GetContentElementsArray(Chapter).Convert((s) => StringToView(new string[] { s })));
 
 
-            pos = 0;
+            posIndexVersion = 0;
             parrafos = Ebook.Version.GetContentElementsArray(Chapter);
             capitulo = Ebook.GetCapitulo(Chapter);
 
@@ -98,33 +138,38 @@ namespace BookStandaritzedGUI
                 tb = element as TextBlock;
                 strTb = tb.Tag.ToString();
                 text = strTb.Split(SEPARACION)[1];
-                while (!text.Contains(parrafos[pos])) pos++;
+                while (!text.Contains(parrafos[posIndexVersion])) posIndexVersion++;
 
-                line = new Run((pos + 1).ToString().PadLeft(3, '0'));
-                line.Foreground = Spliter.IndexNotIn(capitulo.ParrafosEditados, pos+1)? Brushes.DarkRed:Brushes.Violet;
+                line = new Run((posIndexVersion + 1).ToString().PadLeft(3, '0'));
+                line.Foreground = Spliter.IndexNotIn(capitulo.ParrafosEditados, posIndexVersion + 1) ? Brushes.DarkRed : Brushes.DarkViolet;
                 tb.Inlines.InsertBefore(tb.Inlines.FirstInline, line);
                 tb.Inlines.InsertAfter(line, new Run(":") { Foreground = Brushes.Gray });
                 tb.Tag = line.Text + ":" + strTb;
             }
             stkVersion.Tag = stkVersion.Children.ToArray();
             stkReference.Tag = stkReference.Children.ToArray();
-       
+
+
         }
 
-        UIElement StringToView(string str)
+        UIElement StringToView(string[] str)
         {
 
             TextBlock tb;
             Run line;
 
-            Pos++;
-            tb = new TextBlock() { Background = Pos % 2 == 0 ? Brushes.LightGreen : Brushes.Transparent };
-            line = new Run((Pos).ToString().PadLeft(3, '0'));
+            PosIndex++;
+            tb = new TextBlock() { Background = PosIndex % 2 == 0 ? Brushes.LightGreen : Brushes.Transparent, TextWrapping = TextWrapping.WrapWithOverflow, Height = HEIGHTUNIT * HeightMultiplicator };
+            line = new Run((PosIndex).ToString().PadLeft(3, '0'));
             line.Foreground = Brushes.DarkBlue;
             tb.Inlines.Add(line);
             tb.Inlines.Add(new Run(SEPARACION) { Foreground = Brushes.Gray });
-            tb.Inlines.Add(new Run(str));
-            tb.Tag = line.Text + SEPARACION + str;
+
+            for (int i = 0; i < str.Length; i++)
+                tb.Inlines.Add(new Run(str[i]) { Foreground = i % 2 == 0 ? Brushes.Black : Brushes.DarkCyan });
+
+            tb.Tag = string.Join(SEPARACION, line.Text, string.Join(SEPARACION, str));
+
             tb.MouseRightButtonDown += (s, e) =>
             {
                 double offset;
@@ -173,7 +218,7 @@ namespace BookStandaritzedGUI
                 TextBlock tbClicked = (TextBlock)s;
                 if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                 {
-                   
+
                     if (ReferenceEquals(tbClicked.Parent, stkVersion))
                     {//mirar que un spliter no lo contenga ya!!
                         indexTb = GetIndexTb(tbClicked);
@@ -191,7 +236,8 @@ namespace BookStandaritzedGUI
                             }
                             RefreshButtons();
                         }
-                        else {
+                        else
+                        {
                             Notificaciones.CloseAllMessages(nameof(notificationsManagerProgress))
                               .ContinueWith((t) => Notificaciones.ShowMessage("Atención", "Este párrafo es el resultado de un spliter, no se puede usar", notificationType: Notifications.Wpf.Core.NotificationType.Warning, nameControl: nameof(notificationsManagerProgress)));
                         }
@@ -212,7 +258,7 @@ namespace BookStandaritzedGUI
         {
             int inicio, fin;
             bool correcto = true;
-            int  indexInicio;
+            int indexInicio;
             List<Spliter> parrafos;
             TextBlock tbAMirar;
 
@@ -224,8 +270,8 @@ namespace BookStandaritzedGUI
                 parrafos = Ebook.GetCapitulo(Chapter).ParrafosEditados;
                 //selecciono los que están en este rango
                 //si hay alguno no valido paro e informo del problema
-                indexInicio =stkVersion.Children.IndexOf(Selecteds.Find((tb) => GetIndexTb(tb) == inicio));
-                for(int i = inicio+1,j=1; i < fin && correcto; i++,j++)
+                indexInicio = stkVersion.Children.IndexOf(Selecteds.Find((tb) => GetIndexTb(tb) == inicio));
+                for (int i = inicio + 1, j = 1; i < fin && correcto; i++, j++)
                 {//me falla con los que se saltan tiene que dar error
 
                     correcto = Spliter.IndexNotIn(parrafos, i);
@@ -265,26 +311,27 @@ namespace BookStandaritzedGUI
         }
         private void CommonUnirSaltar(int inicio = 1)
         {
-           
-                for (int i = inicio; i < Selecteds.Count; i++)
-                {
-                    Selecteds[i].Height = 0;
-                }
-                IsPreviewOn = true;
+
+            for (int i = inicio; i < Selecteds.Count; i++)
+            {
+                Selecteds[i].Height = 0;
+            }
+            IsPreviewOn = true;
 
         }
 
-       
+
 
         private void btnDeshacer_Click(object sender, RoutedEventArgs e)
         {
             Array arrayTbVersion = ((Array)stkVersion.Tag);
-            Selecteds.ForEach((tb) => {
+            Selecteds.ForEach((tb) =>
+            {
 
                 tb.FontFamily = FontFamilyDefault;
-                tb.Height = DefaultHeight;
-                   
-                
+                tb.Height = HEIGHTUNIT * HeightMultiplicator;
+
+
             });
             Selecteds.Clear();
             RefreshButtons();
@@ -333,9 +380,27 @@ namespace BookStandaritzedGUI
                 }
                 else _ = Notificaciones.ShowMessage("Atención", "Tienes que unir, saltar los parrafos actuales, sino quieres hacer nada con ellos dale a deshacer.", nameControl: nameof(notificationsManagerProgress));
             }
-            else _ = Notificaciones.ShowMessage("Atención", "Tienes que arreglar la union de párrafos actual o darle a deshacer",Notifications.Wpf.Core.NotificationType.Error, nameControl: nameof(notificationsManagerProgress));
+            else _ = Notificaciones.ShowMessage("Atención", "Tienes que arreglar la union de párrafos actual o darle a deshacer", Notifications.Wpf.Core.NotificationType.Error, nameControl: nameof(notificationsManagerProgress));
 
         }
-        private int GetIndexTb(TextBlock tb)=> int.Parse((tb.Inlines.FirstInline as Run).Text);
+        private int GetIndexTb(TextBlock tb) => int.Parse((tb.Inlines.FirstInline as Run).Text);
+        private void RefreshHeight()
+        {
+            TextBlock tbRow;
+            foreach (UIElement element in stkVersion.Children)
+            {
+                tbRow = element as TextBlock;
+                if (tbRow.Height > 0)
+                    tbRow.Height = HEIGHTUNIT * HeightMultiplicator;
+            }
+            foreach (UIElement element in stkReference.Children)
+            {
+                tbRow = element as TextBlock;
+                if (tbRow.Height > 0)
+                    tbRow.Height = HEIGHTUNIT * HeightMultiplicator;
+            }
+        }
     }
+
+
 }

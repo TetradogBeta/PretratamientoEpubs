@@ -19,13 +19,13 @@ namespace CommonEbookPretractament
             return GetParrafos(version, chapter).ToArray().Length == original.Version.GetContentElementsArray(chapter).Length;
            
         }
-        public IEnumerable<string> GetParrafos(EbookSplited version, int chapter)
+        public IEnumerable<string> GetParrafos(EbookSplited version, int chapter,string joiner="")
         {
             IEnumerable<string> parrafosVer = version.GetContentElementsArray(chapter);
 
             if (ParrafosEditados.Count > 0)
             {
-                return Spliter.GetParts(ParrafosEditados,parrafosVer);
+                return Spliter.GetParts(ParrafosEditados,parrafosVer,joiner);
             }
             else
             {
