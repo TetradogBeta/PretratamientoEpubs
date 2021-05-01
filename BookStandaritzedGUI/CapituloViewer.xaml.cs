@@ -439,5 +439,17 @@ namespace BookStandaritzedGUI
             Action act = () => CheckAndSave();
             Dispatcher.BeginInvoke(act);
         }
+
+        private void visorSpliterActual_IndexClick(object sender, TextIndexEventArgs e)
+        {
+            if (e.IsOri)
+            {
+                cmbParrafosReference.SelectedIndex = e.Index;
+            }
+            else
+            {
+                cmbParrafosVersion.SelectedIndex = e.Index;
+            }
+        }
     }
 }

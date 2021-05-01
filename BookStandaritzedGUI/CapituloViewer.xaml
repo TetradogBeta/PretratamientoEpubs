@@ -9,7 +9,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
-            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="300"/>
         </Grid.ColumnDefinitions>
     <Grid >
         <Grid.RowDefinitions>
@@ -97,6 +97,6 @@
         </Grid>
     </Grid>
 
-        <local:VisorSpliter x:Name="visorSpliterActual" Grid.Column="1"/>
+        <local:VisorSpliter x:Name="visorSpliterActual" IndexClick="visorSpliterActual_IndexClick" Grid.Column="1"/>
     </Grid>
 </UserControl>

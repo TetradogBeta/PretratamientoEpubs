@@ -26,8 +26,9 @@ namespace BookStandaritzedGUI
 
 
         static readonly FontFamily FontFamilyDefault = new TextBlock().FontFamily;
-        static readonly FontFamily FontFamilySelected = new FontFamily("Constantia");
+        static readonly FontFamily FontFamilySelected = new FontFamily("Constantia Bold");
 
+        public static bool IsHeightStandard { get; set; } = false;
 
 
         public static int HeightMultiplicator
@@ -59,7 +60,7 @@ namespace BookStandaritzedGUI
             KeyDown += (s, e) =>
             {
 
-                if (e.Key.Equals(Key.F5)) _ = Notificaciones.CloseAllMessages();
+                if (e.Key.Equals(Key.F5)) _ = Notificaciones.CloseAllMessages(nameof(notificationsManagerProgress));
                 else if (e.Key.Equals(Key.F3))
                 {
                     if (HeightMultiplicator > 1)
@@ -75,6 +76,13 @@ namespace BookStandaritzedGUI
                         HeightMultiplicator++;
                         RefreshHeight();
                     }
+                }
+                else if (e.Key.Equals(Key.F6))
+                {
+
+                    IsHeightStandard = !IsHeightStandard;
+                    Reload();
+
                 }
                 else if (e.Key.Equals(Key.F11))
                 {
@@ -97,10 +105,15 @@ namespace BookStandaritzedGUI
             Reload();
             Task.Delay(100).ContinueWith((t) =>
             {
-                _ = Notificaciones.ShowMessage("Sugerencia", "Pulsa 'ctrl' para poder seleccionar/deseleccionar un parrafo", nameControl: nameof(notificationsManagerProgress), notificacionesOn: () => MainWindow.Main.SugerenciasOn);
-                _ = Notificaciones.ShowMessage("Sugerencia", "Si unes se supone que va del indice más pequeño al más grande", nameControl: nameof(notificationsManagerProgress), notificacionesOn: () => MainWindow.Main.SugerenciasOn);
+                if (MainWindow.Main.SugerenciasOn)
+                {
+                    _ = Notificaciones.ShowMessage("Sugerencia", "Pulsa 'ctrl' para poder seleccionar/deseleccionar un parrafo", nameControl: nameof(notificationsManagerProgress));
+                    _ = Notificaciones.ShowMessage("Sugerencia", "Si unes se supone que va del indice más pequeño al más grande", nameControl: nameof(notificationsManagerProgress));
+                }
                 _ = Notificaciones.ShowMessage("Información", "Pulsa F4 para hacer más grandes los bloques de texto", nameControl: nameof(notificationsManagerProgress));
                 _ = Notificaciones.ShowMessage("Información", "Pulsa F3 para hacer más pequeños los bloques de texto", nameControl: nameof(notificationsManagerProgress));
+                _ = Notificaciones.ShowMessage("Información", "Pulsa F6 para hacer que los bloques de texto ocupen su altura natural o vuelvan a ser iguales", nameControl: nameof(notificationsManagerProgress));
+
                 _ = Notificaciones.ShowMessage("Información", "Pulsa F11 para resetear la altura de los bloques de texto", nameControl: nameof(notificationsManagerProgress));
 
             });
@@ -148,7 +161,19 @@ namespace BookStandaritzedGUI
 
             stkVersion.Tag = stkVersion.Children.ToArray();
             stkReference.Tag = stkReference.Children.ToArray();
-
+            Task.Delay(100).ContinueWith((t) =>
+            {
+                Action act = () =>
+                {
+                    TextBlock tbRow;
+                    foreach (UIElement element in stkVersion.Children)
+                    {
+                        tbRow = element as TextBlock;
+                        tbRow.MaxHeight = tbRow.ActualHeight;
+                    }
+                };
+                Dispatcher.BeginInvoke(act);
+            });
 
         }
 
@@ -159,7 +184,16 @@ namespace BookStandaritzedGUI
             Run line;
 
             PosIndex++;
-            tb = new TextBlock() { Background = PosIndex % 2 == 0 ? Brushes.LightGreen : Brushes.Transparent, TextWrapping = TextWrapping.WrapWithOverflow, Height = HEIGHTUNIT * HeightMultiplicator };
+            tb = new TextBlock() { Background = PosIndex % 2 == 0 ? Brushes.LightGreen : Brushes.Transparent };
+            if (IsHeightStandard)
+            {
+                tb.TextWrapping = TextWrapping.WrapWithOverflow;
+                tb.Height = HEIGHTUNIT * HeightMultiplicator;
+            }
+            else
+            {
+                tb.TextWrapping = TextWrapping.Wrap;
+            }
             line = new Run((PosIndex).ToString().PadLeft(3, '0'));
             line.Foreground = Brushes.DarkBlue;
             tb.Inlines.Add(line);
@@ -329,7 +363,14 @@ namespace BookStandaritzedGUI
             {
 
                 tb.FontFamily = FontFamilyDefault;
-                tb.Height = HEIGHTUNIT * HeightMultiplicator;
+                if (IsHeightStandard)
+                {
+                    tb.Height = HEIGHTUNIT * HeightMultiplicator;
+                }
+                else
+                {
+                    tb.Height = tb.MaxHeight;
+                }
 
 
             });
@@ -387,17 +428,25 @@ namespace BookStandaritzedGUI
         private void RefreshHeight()
         {
             TextBlock tbRow;
-            foreach (UIElement element in stkVersion.Children)
+            if (IsHeightStandard)
             {
-                tbRow = element as TextBlock;
-                if (tbRow.Height > 0)
-                    tbRow.Height = HEIGHTUNIT * HeightMultiplicator;
+                foreach (UIElement element in stkVersion.Children)
+                {
+                    tbRow = element as TextBlock;
+                    if (tbRow.Height > 0)
+                        tbRow.Height = HEIGHTUNIT * HeightMultiplicator;
+                }
+                foreach (UIElement element in stkReference.Children)
+                {
+                    tbRow = element as TextBlock;
+                    if (tbRow.Height > 0)
+                        tbRow.Height = HEIGHTUNIT * HeightMultiplicator;
+                }
             }
-            foreach (UIElement element in stkReference.Children)
+            else
             {
-                tbRow = element as TextBlock;
-                if (tbRow.Height > 0)
-                    tbRow.Height = HEIGHTUNIT * HeightMultiplicator;
+                _ = Notificaciones.ShowMessage("Información", "Para ver los cambios activa con F6 la altura standard", Notifications.Wpf.Core.NotificationType.Information, nameControl: nameof(notificationsManagerProgress));
+
             }
         }
     }
