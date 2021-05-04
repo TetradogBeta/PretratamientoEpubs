@@ -152,7 +152,7 @@ namespace BookStandaritzedGUI
             if (splitersNoValidos.Count > 1)
             {
                 if (LastMessage.HasValue)
-                    tAux = MainWindow.Main.CerrarMensaje(LastMessage.Value);
+                    tAux = LastMessage.Value.CloseMessage();
                 else tAux = Task.Delay(1);
 
                 tAux.ContinueWith(t =>

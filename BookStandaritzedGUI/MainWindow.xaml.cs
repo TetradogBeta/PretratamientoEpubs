@@ -24,7 +24,7 @@ namespace BookStandaritzedGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static string Version = "Book Standaritzed V2.3";
+        public static string Version = "Book Standaritzed V2.3B";
         public static MainWindow Main { get; set; }
         public static SortedList<string, EbookStandaritzed> DicStandard { get; set; }
         public static GroupItem Group { get; set; }
@@ -175,7 +175,7 @@ namespace BookStandaritzedGUI
             {
                 SugerenciasOn = !SugerenciasOn;
                 if (LastSugerenciaMode.HasValue)
-                    tAux = CerrarMensaje(LastSugerenciaMode.Value);
+                    tAux = LastSugerenciaMode.Value.CloseMessage();
                 else tAux = Task.Delay(1);
 
                 tAux.ContinueWith(t =>
@@ -189,7 +189,7 @@ namespace BookStandaritzedGUI
             {
                 NotificacionesOn = !NotificacionesOn;
                 if (LastNotificacionMode.HasValue)
-                    tAux = CerrarMensaje(LastNotificacionMode.Value);
+                    tAux = LastNotificacionMode.Value.CloseMessage();
                 else tAux = Task.Delay(1);
 
                 tAux.ContinueWith(t =>
@@ -201,18 +201,13 @@ namespace BookStandaritzedGUI
             }
             else if (e.Key.Equals(Key.F5))
             {
-                _=Notificaciones.CloseAllMessages();
+                _=Notificaciones.CloseAllMessages(nameof(notificationArea));
             }
         }
         public async Task<Guid> MostrarMensaje(string title, string content, TimeSpan? time = default, NotificationType tipo = NotificationType.Information, bool forceNotification = false)
         {
             return await Notificaciones.ShowMessage(title, content, tipo, time, nameof(notificationArea), notificacionesOn: () => NotificacionesOn || forceNotification);
         }
-        public async Task CerrarMensaje(Guid idMensaje)
-        {
-            await idMensaje.CloseMessage();
-        }
-
     }
 
 }

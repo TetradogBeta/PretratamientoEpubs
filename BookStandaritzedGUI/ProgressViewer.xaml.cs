@@ -51,6 +51,7 @@ namespace BookStandaritzedGUI
         bool ErrorUnir { get; set; }
 
 
+
         public event EventHandler HasChanges;
 
         public ProgressViewer()
@@ -107,14 +108,14 @@ namespace BookStandaritzedGUI
             {
                 if (MainWindow.Main.SugerenciasOn)
                 {
-                    _ = Notificaciones.ShowMessage("Sugerencia", "Pulsa 'ctrl' para poder seleccionar/deseleccionar un parrafo", nameControl: nameof(notificationsManagerProgress));
-                    _ = Notificaciones.ShowMessage("Sugerencia", "Si unes se supone que va del indice más pequeño al más grande", nameControl: nameof(notificationsManagerProgress));
+                    _ = Notificaciones.ShowMessage("Sugerencia", "Pulsa 'ctrl' para poder seleccionar/deseleccionar un parrafo", nameControl: nameof(notificationsManagerProgress), notificacionesOn: () => MainWindow.Main.NotificacionesOn);
+                    _ = Notificaciones.ShowMessage("Sugerencia", "Si unes se supone que va del indice más pequeño al más grande", nameControl: nameof(notificationsManagerProgress), notificacionesOn: () => MainWindow.Main.NotificacionesOn);
                 }
-                _ = Notificaciones.ShowMessage("Información", "Pulsa F4 para hacer más grandes los bloques de texto", nameControl: nameof(notificationsManagerProgress));
-                _ = Notificaciones.ShowMessage("Información", "Pulsa F3 para hacer más pequeños los bloques de texto", nameControl: nameof(notificationsManagerProgress));
-                _ = Notificaciones.ShowMessage("Información", "Pulsa F6 para hacer que los bloques de texto ocupen su altura natural o vuelvan a ser iguales", nameControl: nameof(notificationsManagerProgress));
+                _ = Notificaciones.ShowMessage("Información", "Pulsa F4 para hacer más grandes los bloques de texto", nameControl: nameof(notificationsManagerProgress), notificacionesOn: () => MainWindow.Main.NotificacionesOn);
+                _ = Notificaciones.ShowMessage("Información", "Pulsa F3 para hacer más pequeños los bloques de texto", nameControl: nameof(notificationsManagerProgress), notificacionesOn: () => MainWindow.Main.NotificacionesOn);
+                _ = Notificaciones.ShowMessage("Información", "Pulsa F6 para hacer que los bloques de texto ocupen su altura natural o vuelvan a ser iguales", nameControl: nameof(notificationsManagerProgress), notificacionesOn: () => MainWindow.Main.NotificacionesOn);
 
-                _ = Notificaciones.ShowMessage("Información", "Pulsa F11 para resetear la altura de los bloques de texto", nameControl: nameof(notificationsManagerProgress));
+                _ = Notificaciones.ShowMessage("Información", "Pulsa F11 para resetear la altura de los bloques de texto", nameControl: nameof(notificationsManagerProgress), notificacionesOn: () => MainWindow.Main.NotificacionesOn);
 
             });
         }
@@ -159,10 +160,10 @@ namespace BookStandaritzedGUI
                 tb.Tag = line.Text + ":" + strTb;
             }
 
-            stkVersion.Tag = stkVersion.Children.ToArray();
-            stkReference.Tag = stkReference.Children.ToArray();
+            stkVersion.Tag = stkVersion.Children.ToArray().ToList();
+            stkReference.Tag = stkReference.Children.ToArray().ToList();
             Task.Delay(100).ContinueWith((t) =>
-            {
+            {//al parecer para obtener la altura tengo que  hacer un beginInvoke o no funciona
                 Action act = () =>
                 {
                     TextBlock tbRow;
@@ -171,6 +172,7 @@ namespace BookStandaritzedGUI
                         tbRow = element as TextBlock;
                         tbRow.MaxHeight = tbRow.ActualHeight;
                     }
+
                 };
                 Dispatcher.BeginInvoke(act);
             });
@@ -204,83 +206,104 @@ namespace BookStandaritzedGUI
 
             tb.Tag = string.Join(SEPARACION, line.Text, string.Join(SEPARACION, str));
 
-            tb.MouseRightButtonDown += (s, e) =>
+            tb.MouseRightButtonDown += TextBlockMouseRightClick;
+            tb.MouseLeftButtonDown += TextBlockMouseLeftClick;
+            return tb;
+        }
+
+        private void TextBlockMouseLeftClick(object sender, MouseButtonEventArgs e)
+        {
+
+            int indexTb;
+            TextBlock tbClicked = (TextBlock)sender;
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
             {
-                double offset;
-                TextBlock tbFound = default;
-                StackPanel stkAMover, stkElementOrigen;
-                ScrollViewer scAMover;
-                TextBlock tbClicked = s as TextBlock;
-                int itemPos;
-                object[] items;
 
-                if (ReferenceEquals(tbClicked.Parent, stkReference))
-                {
-
-                    //mover scroll Version
-                    stkAMover = stkVersion;
-                    stkElementOrigen = stkReference;
-                }
-                else
-                {
-                    //mover scroll Referencia
-                    stkAMover = stkReference;
-                    stkElementOrigen = stkVersion;
-                }
-                itemPos = stkElementOrigen.Children.IndexOf(tbClicked);
-
-
-                items = (object[])stkAMover.Tag;
-                if (itemPos < items.Length)
-                    tbFound = (TextBlock)items[itemPos];
-
-                scAMover = stkAMover.Parent as ScrollViewer;
-
-                if (!Equals(tbFound, default))
-                {
-                    offset = ((stkElementOrigen.Parent as ScrollViewer).VerticalOffset - (tbClicked.ActualHeight * itemPos)) + tbFound.ActualHeight * (stkAMover.Children.IndexOf(tbFound));
-
-                    scAMover.ScrollToVerticalOffset(offset);
-                }
-                else
-                    scAMover.ScrollToVerticalOffset(stkAMover.ActualHeight);
-                scAMover.UpdateLayout();
-            };
-            tb.MouseLeftButtonDown += (s, e) =>
-            {
-                int indexTb;
-                TextBlock tbClicked = (TextBlock)s;
-                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-                {
-
-                    if (ReferenceEquals(tbClicked.Parent, stkVersion))
-                    {//mirar que un spliter no lo contenga ya!!
-                        indexTb = GetIndexTb(tbClicked);
-                        if (Spliter.IndexNotIn(Ebook.GetCapitulo(Chapter).ParrafosEditados, indexTb))
+                if (ReferenceEquals(tbClicked.Parent, stkVersion))
+                {//mirar que un spliter no lo contenga ya!!
+                    indexTb = GetFirstIndex(tbClicked);
+                    if (Spliter.IndexNotIn(Ebook.GetCapitulo(Chapter).ParrafosEditados, indexTb))
+                    {
+                        if (Selecteds.Contains(tbClicked))
                         {
-                            if (Selecteds.Contains(tbClicked))
-                            {
-                                Selecteds.Remove(tbClicked);
-                                tbClicked.FontFamily = FontFamilyDefault;
-                            }
-                            else
-                            {
-                                Selecteds.Add(tbClicked);
-                                tbClicked.FontFamily = FontFamilySelected;
-                            }
-                            RefreshButtons();
+                            Selecteds.Remove(tbClicked);
+                            tbClicked.FontFamily = FontFamilyDefault;
                         }
                         else
                         {
-                            Notificaciones.CloseAllMessages(nameof(notificationsManagerProgress))
-                              .ContinueWith((t) => Notificaciones.ShowMessage("Atención", "Este párrafo es el resultado de un spliter, no se puede usar", notificationType: Notifications.Wpf.Core.NotificationType.Warning, nameControl: nameof(notificationsManagerProgress)));
+                            Selecteds.Add(tbClicked);
+                            tbClicked.FontFamily = FontFamilySelected;
                         }
+                        RefreshButtons();
                     }
-
+                    else
+                    {
+                        Notificaciones.CloseAllMessages(nameof(notificationsManagerProgress))
+                          .ContinueWith((t) => Notificaciones.ShowMessage("Atención", "Este párrafo es el resultado de un spliter, no se puede usar", notificationType: Notifications.Wpf.Core.NotificationType.Warning, nameControl: nameof(notificationsManagerProgress)));
+                    }
                 }
 
-            };
-            return tb;
+            }
+
+
+        }
+
+        private void TextBlockMouseRightClick(object sender, MouseButtonEventArgs e)
+        {
+
+            double offset;
+            TextBlock tbFound = default;
+            StackPanel stkAMover, stkElementOrigen;
+            ScrollViewer scAMover;
+            TextBlock tbClicked = sender as TextBlock;
+            int itemPos;
+            List<object> items;
+
+
+            if (ReferenceEquals(tbClicked.Parent, stkReference))
+            {
+
+                //mover scroll Version
+                stkAMover = stkVersion;
+                stkElementOrigen = stkReference;
+            }
+            else
+            {
+                //mover scroll Referencia
+                stkAMover = stkReference;
+                stkElementOrigen = stkVersion;
+            }
+            itemPos = GetScrollIndexTb(tbClicked);
+
+
+            items = (List<object>)stkAMover.Tag;
+            itemPos = items.IndexOf(items.Filtra((tb) => GetScrollIndexTb(tb as TextBlock) == itemPos).FirstOrDefault());
+            if (itemPos >= 0 && itemPos < items.Count)
+                tbFound = (TextBlock)items[itemPos];
+
+            scAMover = stkAMover.Parent as ScrollViewer;
+
+            if (!Equals(tbFound, default))
+            {
+                if (!IsHeightStandard)
+                {
+                    //pongo el elemento al principio de la lista
+                    if (itemPos > 0)
+                        offset = items.SubList(0, itemPos).Sum((tb) => (tb as TextBlock).ActualHeight);
+                    else offset = 0;
+
+                    //ahora le sumo la posición del elemento clicado para que estén alineados
+                    offset += ((ScrollViewer)stkElementOrigen.Parent).TranslatePoint(new Point(), tbClicked).Y;
+                }
+                else offset = ((ScrollViewer)stkElementOrigen.Parent).VerticalOffset;
+                scAMover.ScrollToVerticalOffset(offset);
+
+
+            }
+            else
+                scAMover.ScrollToVerticalOffset(stkAMover.ActualHeight);
+            scAMover.UpdateLayout();
+
         }
 
         private void RefreshButtons()
@@ -299,12 +322,12 @@ namespace BookStandaritzedGUI
             if (!EstaUniendo.HasValue || EstaUniendo.Value)
             {//hay un bug al saltarse uno o varios estos no desaparecen
 
-                inicio = Selecteds.Min((tb) => GetIndexTb(tb));
-                fin = Selecteds.Max((tb) => GetIndexTb(tb));
+                inicio = Selecteds.Min((tb) => GetFirstIndex(tb));
+                fin = Selecteds.Max((tb) => GetFirstIndex(tb));
                 parrafos = Ebook.GetCapitulo(Chapter).ParrafosEditados;
                 //selecciono los que están en este rango
                 //si hay alguno no valido paro e informo del problema
-                indexInicio = stkVersion.Children.IndexOf(Selecteds.Find((tb) => GetIndexTb(tb) == inicio));
+                indexInicio = stkVersion.Children.IndexOf(Selecteds.Find((tb) => GetFirstIndex(tb) == inicio));
                 for (int i = inicio + 1, j = 1; i < fin && correcto; i++, j++)
                 {//me falla con los que se saltan tiene que dar error
 
@@ -358,7 +381,7 @@ namespace BookStandaritzedGUI
 
         private void btnDeshacer_Click(object sender, RoutedEventArgs e)
         {
-            Array arrayTbVersion = ((Array)stkVersion.Tag);
+            List<object> arrayTbVersion = ((List<object>)stkVersion.Tag);
             Selecteds.ForEach((tb) =>
             {
 
@@ -395,8 +418,8 @@ namespace BookStandaritzedGUI
                     if (EstaUniendo.GetValueOrDefault())
                     {
                         //unir
-                        inicio = Selecteds.Min((tb) => GetIndexTb(tb));
-                        fin = Selecteds.Max((tb) => GetIndexTb(tb));
+                        inicio = Selecteds.Min((tb) => GetFirstIndex(tb));
+                        fin = Selecteds.Max((tb) => GetFirstIndex(tb));
                         parrafos.Add(new Spliter() { EditIndexInicio = inicio, EditIndexFin = fin });
                     }
                     else
@@ -404,7 +427,7 @@ namespace BookStandaritzedGUI
                         //saltar
                         Selecteds.ForEach((tbSaltar) =>
                         {
-                            inicio = GetIndexTb(tbSaltar);
+                            inicio = GetFirstIndex(tbSaltar);
                             parrafos.Add(new Spliter() { EditIndexInicio = inicio, Saltar = true });
                         });
                     }
@@ -424,7 +447,8 @@ namespace BookStandaritzedGUI
             else _ = Notificaciones.ShowMessage("Atención", "Tienes que arreglar la union de párrafos actual o darle a deshacer", Notifications.Wpf.Core.NotificationType.Error, nameControl: nameof(notificationsManagerProgress));
 
         }
-        private int GetIndexTb(TextBlock tb) => int.Parse((tb.Inlines.FirstInline as Run).Text);
+        private int GetFirstIndex(TextBlock tb) => int.Parse((tb.Inlines.FirstInline as Run).Text);
+        private int GetScrollIndexTb(TextBlock tb) => ReferenceEquals(tb.Parent, stkVersion) ? int.Parse((tb.Inlines.FirstInline.NextInline.NextInline as Run).Text) : GetFirstIndex(tb);
         private void RefreshHeight()
         {
             TextBlock tbRow;
