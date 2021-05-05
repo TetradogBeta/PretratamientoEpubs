@@ -260,6 +260,7 @@ namespace BookStandaritzedGUI
             List<object> items;
 
 
+
             if (ReferenceEquals(tbClicked.Parent, stkReference))
             {
 
@@ -279,7 +280,9 @@ namespace BookStandaritzedGUI
             items = (List<object>)stkAMover.Tag;
             itemPos = items.IndexOf(items.Filtra((tb) => GetScrollIndexTb(tb as TextBlock) == itemPos).FirstOrDefault());
             if (itemPos >= 0 && itemPos < items.Count)
-                tbFound = (TextBlock)items[itemPos];
+            {
+                tbFound = (TextBlock) items[itemPos];  
+            }
 
             scAMover = stkAMover.Parent as ScrollViewer;
 
@@ -289,8 +292,12 @@ namespace BookStandaritzedGUI
                 {
                     //pongo el elemento al principio de la lista
                     if (itemPos > 0)
+                    {
                         offset = items.SubList(0, itemPos).Sum((tb) => (tb as TextBlock).ActualHeight);
+                    }
                     else offset = 0;
+
+                
 
                     //ahora le sumo la posición del elemento clicado para que estén alineados
                     offset += ((ScrollViewer)stkElementOrigen.Parent).TranslatePoint(new Point(), tbClicked).Y;

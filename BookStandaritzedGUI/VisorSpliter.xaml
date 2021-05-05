@@ -22,10 +22,10 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <TextBlock x:Name="tbSpliterTextVer" TextWrapping="Wrap" Background="AntiqueWhite" PreviewMouseLeftButtonDown="tbSpliterTextVer_MouseLeftButtonDown" PreviewMouseRightButtonDown="tbSpliterTextVer_MouseLeftButtonDown" />
+                <TextBlock x:Name="tbSpliterTextVer" TextWrapping="Wrap" Background="AntiqueWhite" />
             </ScrollViewer>
             <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="1">
-                <TextBlock x:Name="tbSpliterTextOri" TextWrapping="Wrap"  Background="AliceBlue" PreviewMouseLeftButtonDown="tbSpliterTextOri_MouseLeftButtonDown" PreviewMouseRightButtonDown="tbSpliterTextOri_MouseLeftButtonDown" />
+                <TextBlock x:Name="tbSpliterTextOri" TextWrapping="Wrap"  Background="AliceBlue" PreviewMouseLeftButtonDown="Parrafo_MouseButtonDown" PreviewMouseRightButtonDown="Parrafo_MouseButtonDown" />
             </ScrollViewer>
         </Grid>
     </Grid>

@@ -44,6 +44,8 @@ namespace BookStandaritzedGUI
             string[] partesParrafo;
             int indexParrafo;
             int indexParrafoOri;
+            Run parrafo;
+            int indexParrafoVer=0;
 
             tbSpliterTextVer.Inlines.Clear();
             tbSpliterTextVer.Text = "";
@@ -70,8 +72,17 @@ namespace BookStandaritzedGUI
                         partesParrafo = parrafos[indexParrafo].Split(JOIN);
                         tbSpliterTextVer.Tag = Ebook.Version.GetContentElementsArray(Chapter).ToList().IndexOf(partesParrafo[0]);
                         foreach (string str in partesParrafo)
-                            tbSpliterTextVer.Inlines.Add(new Run() { Text =(string.IsNullOrEmpty( str)?"-SIN TEXTO A MOSTRAR-":string.IsNullOrWhiteSpace(str) ?"-ESPACIO EN BLANCO-":str) +"\n", Foreground = (pos++) % 2 == 0 ? Brushes.Gray : Brushes.Black });
-                        tbSpliterTextOri.Text = Ebook.Reference.GetContentElementsArray(Chapter)[indexParrafoOri];
+                        {
+                            parrafo = new Run() { Text = (string.IsNullOrEmpty(str) ? "-SIN TEXTO A MOSTRAR-" : string.IsNullOrWhiteSpace(str) ? "-ESPACIO EN BLANCO-" : str) + "\n", Foreground = (pos++) % 2 == 0 ? Brushes.Gray : Brushes.Black };
+                            parrafo.PreviewMouseLeftButtonDown += Parrafo_MouseButtonDown;
+                            parrafo.PreviewMouseRightButtonDown += Parrafo_MouseButtonDown;
+                            parrafo.Tag = indexParrafoVer;
+                            indexParrafoVer++;
+
+
+                            tbSpliterTextVer.Inlines.Add(parrafo);
+                        }
+                            tbSpliterTextOri.Text = Ebook.Reference.GetContentElementsArray(Chapter)[indexParrafoOri];
                         tbSpliterTextOri.Tag = indexParrafoOri;
                     }
                 }
@@ -88,21 +99,19 @@ namespace BookStandaritzedGUI
                 
         }
 
-        private void tbSpliterTextVer_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (!Equals(tbSpliterTextVer.Tag, default))
-            {
-                if (IndexClick != null)
-                    IndexClick(this, new TextIndexEventArgs((int)tbSpliterTextVer.Tag, false));
-            }
-        }
 
-        private void tbSpliterTextOri_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Parrafo_MouseButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (!Equals(tbSpliterTextOri.Tag, default))
+            bool isOri = ReferenceEquals(sender,tbSpliterTextOri);
+            TextBlock tb = isOri ? tbSpliterTextOri : tbSpliterTextVer;
+            int indexParrafo = 0;
+
+            if (!Equals(tb.Tag, default))
             {
+                if (!isOri)
+                  indexParrafo=(int)(sender as Run).Tag;
                 if (IndexClick != null)
-                    IndexClick(this, new TextIndexEventArgs((int)tbSpliterTextOri.Tag, true));
+                    IndexClick(this, new TextIndexEventArgs((int)tb.Tag+indexParrafo, isOri));
             }
         }
     }
