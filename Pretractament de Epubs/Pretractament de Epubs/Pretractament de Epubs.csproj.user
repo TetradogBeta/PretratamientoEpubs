@@ -16,6 +16,15 @@
     <Compile Update="Controls\ViewPresentation.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Fase0\EpubsManager.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Fase0\IdiomaManager.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Fase0\VisorIdioma.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Presentation\Init\First.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -31,6 +40,15 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Controls\ViewPresentation.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Fase0\EpubsManager.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Fase0\IdiomaManager.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Fase0\VisorIdioma.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MainWindow.xaml">

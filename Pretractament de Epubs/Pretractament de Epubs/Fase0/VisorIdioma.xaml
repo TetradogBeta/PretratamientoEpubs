@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="PretractamentDeEpubs.Fase0.VisorIdioma"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PretractamentDeEpubs.Fase0"
+             mc:Ignorable="d" 
+             d:DesignHeight="75" d:DesignWidth="400">
+    <Grid >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        
+        <Image x:Name="imgIcono" />
+        <TextBlock x:Name="txtNombre" Grid.Column="1" />
+        <TextBlock x:Name="txtCulture" Grid.Column="2" />
+        <Image x:Name="imgHayTraduccionApp" Grid.Column="3" />
+    </Grid>
+</UserControl>
