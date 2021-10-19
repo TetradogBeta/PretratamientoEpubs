@@ -183,7 +183,7 @@ namespace CommonEbookPretractament
             return ebooks.ToArray();
         }
 
-        public static EbookSplited[] GetEbookSpliteds()
+        public static List<EbookSplited> GetEbookSpliteds()
         {
             FileInfo[] files = new DirectoryInfo(Directory).GetFiles();
             List<EbookSplited> ebooks = new List<EbookSplited>();
@@ -198,7 +198,7 @@ namespace CommonEbookPretractament
 
                 }
             }
-            return ebooks.ToArray();
+            return ebooks;
         }
 
 

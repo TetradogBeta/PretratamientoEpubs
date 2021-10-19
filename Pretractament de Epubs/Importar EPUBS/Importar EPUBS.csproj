@@ -8,4 +8,8 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\TestReadEpub\TestReadEpub.csproj" />
+  </ItemGroup>
+
 </Project>

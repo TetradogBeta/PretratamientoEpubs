@@ -7,11 +7,17 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="EditorCreadorLibro.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="ImportList.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="EditorCreadorLibro.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="ImportList.xaml">
       <SubType>Designer</SubType>
     </Page>

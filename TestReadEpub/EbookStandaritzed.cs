@@ -187,10 +187,10 @@ namespace CommonEbookPretractament
             return equals;
         }
         public static EbookStandaritzed GetEbookStandaritzed(byte[] data) => (EbookStandaritzed)Serializador.GetObject(data);
-        public static EbookStandaritzed[] GetEbookStandaritzeds()
+        public static IEnumerable<EbookStandaritzed> GetEbookStandaritzeds()
         {
             FileInfo[] files = new DirectoryInfo(Directory).GetFiles();
-            return files.Convert((f) => GetEbookStandaritzed(f.GetBytes()));
+            return files.Select((f) => GetEbookStandaritzed(f.GetBytes()));
 
         }
 
